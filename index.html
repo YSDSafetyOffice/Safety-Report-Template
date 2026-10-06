@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,6 +22,7 @@ body{
   font-family:'Barlow', Arial, sans-serif;
   background:var(--bg);
   color:#232323;
+  padding-bottom:96px; /* clears the fixed Save as PDF bar at the bottom */
 }
 
 /* ---------- editable affordance ---------- */
@@ -249,17 +251,10 @@ main{ padding:24px; }
   user-select:none;
 }
 .photo-item .photo-wrap:active{ cursor:grabbing; }
-/* Selecting a photo (a plain tap/click, no drag) shows a red outline and
-   reveals its resize handle and View/Delete buttons — dragging and
-   resizing also add a lifted shadow while in progress. */
-.photo-item.selected .photo-wrap{
-  border-color:var(--red);
-  border-width:2px;
-  box-shadow:0 0 0 3px rgba(204,27,27,.20);
-}
 .photo-item.dragging .photo-wrap,
 .photo-item.resizing .photo-wrap{
   box-shadow:0 4px 16px rgba(0,0,0,.25);
+  border-color:var(--red);
 }
 .photo-item img{
   width:100%;
@@ -277,30 +272,26 @@ main{ padding:24px; }
 .photo-controls{
   position:absolute;
   top:6px; right:6px;
-  display:none;
+  display:flex;
   gap:4px;
-  background:rgba(0,0,0,.55);
+  background:rgba(0,0,0,.45);
   border-radius:4px;
-  padding:4px;
+  padding:3px;
   z-index:5;
 }
-.photo-item.selected .photo-controls{ display:flex; }
 .photo-controls button{
-  height:26px;
-  min-width:26px;
+  width:24px; height:24px;
   font-size:12px;
-  font-family:'Barlow Condensed', sans-serif;
-  font-weight:600;
   line-height:1;
-  padding:0 9px;
+  padding:0;
   border:none;
   border-radius:3px;
-  background:rgba(255,255,255,.92);
+  background:rgba(255,255,255,.9);
   color:#232323;
   cursor:pointer;
 }
 .photo-controls button:hover{ background:#fff; }
-.photo-controls button.danger{ background:var(--red); color:#fff; padding:0; width:26px; }
+.photo-controls button.danger{ background:var(--red); color:#fff; }
 .photo-controls button.danger:hover{ background:var(--red-dark); }
 .resize-handle{
   position:absolute;
@@ -309,15 +300,13 @@ main{ padding:24px; }
   cursor:nwse-resize;
   touch-action:none;
   z-index:5;
-  display:none;
-  background:var(--red);
+  background:rgba(0,0,0,.45);
   border:2px solid #fff;
   border-radius:50%;
+  display:flex;
   align-items:center;
   justify-content:center;
-  box-shadow:0 1px 4px rgba(0,0,0,.35);
 }
-.photo-item.selected .resize-handle{ display:flex; }
 .resize-handle:before{
   content:'\2194';
   color:#fff;
@@ -327,7 +316,7 @@ main{ padding:24px; }
   transform:rotate(45deg);
   font-family:Arial,sans-serif;
 }
-.resize-handle:hover{ background:var(--red-dark); }
+.resize-handle:hover{ background:var(--red); }
 
 .drop-zone{
   margin-top:14px;
@@ -399,43 +388,25 @@ footer .prepared-line{
   margin-top:4px;
 }
 
-/* ---------- lightbox ---------- */
-#lb{
-  display:none;
-  position:fixed;
-  top:0; left:0; right:0; bottom:0;
-  background:rgba(0,0,0,.9);
-  z-index:999;
-  align-items:center;
-  justify-content:center;
-  padding:24px;
-}
-#lb.open{ display:flex; }
-#lb img{ max-width:100%; max-height:100%; border-radius:4px; }
-#lb .lb-close{
-  position:absolute;
-  top:18px; right:26px;
-  color:#fff;
-  font-size:32px;
-  cursor:pointer;
-  font-family:Arial,sans-serif;
-}
-
-/* ---------- bottom action bar ---------- */
+/* ---------- bottom action bar (fixed, matches YSD report standard) ---------- */
 .bottom-bar{
+  position:fixed;
+  left:0; right:0; bottom:0;
   background:#ffffff;
   border-top:3px solid var(--red);
-  padding:16px;
+  padding:14px 16px;
   display:flex;
-  gap:10px;
-  justify-content:center;
-  flex-wrap:wrap;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+  z-index:500;
+  box-shadow:0 -2px 10px rgba(0,0,0,.08);
 }
 .bottom-bar .btn{
-  font-size:15px;
-  padding:12px 22px;
-  flex:1 1 220px;
-  max-width:340px;
+  font-size:16px;
+  padding:14px 22px;
+  width:100%;
+  max-width:640px;
   justify-content:center;
 }
 .save-status{
@@ -444,7 +415,6 @@ footer .prepared-line{
   font-size:11.5px;
   color:#999;
   font-family:'Barlow Condensed', sans-serif;
-  order:99;
 }
 
 /* ---------- responsive ---------- */
@@ -452,14 +422,14 @@ footer .prepared-line{
   .info-grid{ grid-template-columns:repeat(2,1fr); }
 }
 @media (max-width:480px){
-  header{ padding:12px 14px; flex-wrap:wrap; }
+  header{ padding:12px 14px; }
   header img.logo{ height:52px; }
   header .title-area h1{ font-size:18px; }
   header .title-area .subtitle{ font-size:12px; }
   .date-badge{ font-size:12px; padding:3px 9px; }
   main{ padding:14px; }
   .info-grid{ grid-template-columns:1fr; }
-  .bottom-bar .btn{ font-size:13.5px; padding:11px 14px; flex:1 1 100%; max-width:none; }
+  .bottom-bar .btn{ font-size:14.5px; padding:12px 14px; max-width:none; }
 }
 
 @media (orientation:landscape) and (max-width:1100px){
@@ -467,17 +437,305 @@ footer .prepared-line{
   main{ padding:16px; }
 }
 
+
+/* =====================================================================
+   PHOTO EDITOR, LIGHTBOX, VIEW MODE, PRINT  (v2)
+   ===================================================================== */
+.editable{ overflow-wrap:anywhere; }
+.photo-canvas{ isolation:isolate; }
+
+/* ---------- photo item / image box ---------- */
+.photo-item .photo-wrap{
+  position:relative;
+  border:1px solid #ddd;
+  border-radius:4px;
+  overflow:hidden;
+  background:#fff;
+  cursor:grab;
+  touch-action:pan-y;
+  user-select:none;
+  -webkit-user-select:none;
+}
+.photo-item.selected .photo-wrap{ touch-action:none; outline:2px solid var(--red); outline-offset:1px; }
+.photo-item.locked .photo-wrap{ cursor:pointer; }
+.photo-item.has-border .photo-wrap{ box-shadow:0 0 0 3px #232323; }
+.img-box{
+  position:relative;
+  width:100%;
+  overflow:hidden;
+  background:#eee;
+  line-height:0;
+}
+.img-box img.pimg{
+  position:absolute;
+  left:50%; top:50%;
+  max-width:none;
+  display:block;
+  transform-origin:50% 50%;
+  pointer-events:none;
+  -webkit-user-drag:none;
+}
+.img-box svg.marks{
+  position:absolute; left:0; top:0;
+  width:100%; height:100%;
+  pointer-events:none;
+  overflow:hidden;
+  font-family:'Barlow Condensed', Arial, sans-serif;
+}
+.rh{
+  position:absolute;
+  width:15px; height:15px;
+  background:#fff;
+  border:2px solid var(--red);
+  border-radius:50%;
+  z-index:6;
+  display:none;
+  touch-action:none;
+}
+.photo-item.selected:not(.locked) .rh{ display:block; }
+.rh.nw{ left:4px; top:4px; cursor:nwse-resize; }
+.rh.ne{ right:4px; top:4px; cursor:nesw-resize; }
+.rh.sw{ left:4px; bottom:4px; cursor:nesw-resize; }
+.rh.se{ right:4px; bottom:4px; cursor:nwse-resize; }
+.photo-item.cropping .rh, .photo-item.marking .rh{ display:none !important; }
+.snap-guide{ position:absolute; background:var(--red); opacity:.75; pointer-events:none; z-index:9999; }
+.snap-guide.v{ width:1px; top:0; bottom:0; }
+.snap-guide.h{ height:1px; left:0; right:0; }
+.arr-sel{
+  font-family:'Barlow Condensed', sans-serif;
+  font-size:12px;
+  border:1.5px solid var(--red);
+  color:var(--red);
+  background:#fff;
+  border-radius:3px;
+  padding:2px 4px;
+  cursor:pointer;
+}
+
+/* ---------- crop layer ---------- */
+.crop-layer{ position:absolute; inset:0; overflow:hidden; z-index:7; touch-action:none; cursor:default; }
+.crop-rect{
+  position:absolute;
+  box-shadow:0 0 0 9999px rgba(0,0,0,.58);
+  outline:2px solid #fff;
+  cursor:move;
+  background:
+    linear-gradient(to right, transparent 33.2%, rgba(255,255,255,.55) 33.3%, rgba(255,255,255,.55) 33.5%, transparent 33.6%, transparent 66.5%, rgba(255,255,255,.55) 66.6%, rgba(255,255,255,.55) 66.8%, transparent 66.9%),
+    linear-gradient(to bottom, transparent 33.2%, rgba(255,255,255,.55) 33.3%, rgba(255,255,255,.55) 33.5%, transparent 33.6%, transparent 66.5%, rgba(255,255,255,.55) 66.6%, rgba(255,255,255,.55) 66.8%, transparent 66.9%);
+}
+.ch{
+  position:absolute;
+  width:18px; height:18px;
+  background:var(--red);
+  border:2px solid #fff;
+  border-radius:3px;
+  touch-action:none;
+}
+.ch.nw{ left:0; top:0; cursor:nwse-resize; }
+.ch.ne{ right:0; top:0; cursor:nesw-resize; }
+.ch.sw{ left:0; bottom:0; cursor:nesw-resize; }
+.ch.se{ right:0; bottom:0; cursor:nwse-resize; }
+.ch.n{ left:calc(50% - 9px); top:0; cursor:ns-resize; }
+.ch.s{ left:calc(50% - 9px); bottom:0; cursor:ns-resize; }
+.ch.w{ top:calc(50% - 9px); left:0; cursor:ew-resize; }
+.ch.e{ top:calc(50% - 9px); right:0; cursor:ew-resize; }
+.crop-layer[data-ratio="1"] .ch.n, .crop-layer[data-ratio="1"] .ch.s,
+.crop-layer[data-ratio="1"] .ch.w, .crop-layer[data-ratio="1"] .ch.e{ display:none; }
+.mark-layer{ position:absolute; inset:0; z-index:7; cursor:crosshair; touch-action:none; }
+
+/* ---------- docked photo toolbar ---------- */
+.ptb{
+  position:fixed;
+  left:50%;
+  transform:translateX(-50%);
+  bottom:108px;
+  z-index:600;
+  background:#232323;
+  color:#fff;
+  border-radius:8px;
+  border-top:3px solid var(--red);
+  box-shadow:0 6px 22px rgba(0,0,0,.35);
+  padding:8px 10px;
+  max-width:calc(100vw - 16px);
+  font-family:'Barlow Condensed', sans-serif;
+}
+.ptb[hidden]{ display:none; }
+.ptb-row{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; justify-content:center; }
+.ptb-row + .ptb-row{ margin-top:8px; padding-top:8px; border-top:1px solid #444; }
+.ptb button{
+  background:#3a3a3a;
+  color:#fff;
+  border:1px solid #555;
+  border-radius:4px;
+  font:600 13.5px 'Barlow Condensed', sans-serif;
+  padding:6px 10px;
+  cursor:pointer;
+  letter-spacing:.2px;
+}
+.ptb button:hover{ background:#4c4c4c; }
+.ptb button.on{ background:var(--red); border-color:var(--red); }
+.ptb button.danger{ background:#7a1212; border-color:#a91515; }
+.ptb button.apply{ background:#1f7a3d; border-color:#27a050; }
+.ptb .ptb-label{ font-size:12px; color:#bbb; text-transform:uppercase; letter-spacing:.6px; margin-right:2px; }
+.ptb input[type=range]{ width:108px; accent-color:var(--red); }
+.ptb label{ font-size:13px; display:flex; align-items:center; gap:6px; color:#ddd; }
+.ptb .sw{ width:22px; height:22px; border-radius:50%; border:2px solid #777; padding:0; }
+.ptb .sw.on{ border-color:#fff; outline:2px solid var(--red); }
+body.ptb-open{ padding-bottom:270px; }
+@media (max-width:720px){
+  .ptb{ left:0; right:0; transform:none; max-width:none; bottom:96px; border-radius:8px 8px 0 0; padding:6px 8px; }
+  .ptb-row{ flex-wrap:nowrap; overflow-x:auto; justify-content:flex-start; -webkit-overflow-scrolling:touch; padding-bottom:2px; }
+  .ptb button, .ptb label, .ptb .ptb-label{ flex:0 0 auto; white-space:nowrap; }
+  .ptb button{ font-size:12.5px; padding:6px 9px; }
+  .ptb input[type=range]{ width:84px; }
+  body.ptb-open{ padding-bottom:170px; }
+  .group-head{ flex-wrap:wrap; }
+  .group-title{ flex:1 1 100%; }
+}
+
+/* ---------- lightbox (enlarged view) ---------- */
+#lb{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(10,10,10,.93);
+  z-index:1000;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:16px 12px 10px;
+}
+#lb.open{ display:flex; }
+#lb .lb-view{
+  position:relative;
+  flex:1 1 auto;
+  min-height:0;
+  max-width:100%;
+  overflow:auto;
+  display:flex;
+}
+#lb .lb-stage{
+  position:relative;
+  margin:auto;
+  background:#fff;
+  border-radius:3px;
+  flex:0 0 auto;
+  cursor:zoom-in;
+}
+#lb.zoomed .lb-stage{ cursor:zoom-out; }
+#lb .lb-stage .img-box{ height:100%; }
+#lb .lb-cap{
+  color:#eee;
+  font-family:'Barlow Condensed', sans-serif;
+  font-size:16px;
+  padding:8px 60px 0;
+  text-align:center;
+  min-height:30px;
+}
+#lb .lb-count{ color:#999; font-size:13px; font-family:'Barlow Condensed', sans-serif; }
+#lb .lb-btn{
+  position:absolute;
+  background:rgba(255,255,255,.14);
+  color:#fff;
+  border:none;
+  border-radius:50%;
+  width:44px; height:44px;
+  font-size:30px;
+  line-height:1;
+  cursor:pointer;
+  font-family:Arial, sans-serif;
+  z-index:3;
+}
+#lb .lb-btn:hover{ background:var(--red); }
+#lb .lb-close{ top:12px; right:14px; }
+#lb .lb-prev{ left:12px; top:50%; margin-top:-22px; }
+#lb .lb-next{ right:12px; top:50%; margin-top:-22px; }
+#lb.single .lb-prev, #lb.single .lb-next{ display:none; }
+
+/* ---------- keyboard shortcut sheet ---------- */
+#kb{
+  display:none;
+  position:fixed; inset:0;
+  background:rgba(10,10,10,.8);
+  z-index:1100;
+  align-items:center; justify-content:center;
+  padding:16px;
+}
+#kb.open{ display:flex; }
+#kb .kb-card{
+  background:#fff;
+  border-radius:6px;
+  border-top:5px solid var(--red);
+  max-width:760px;
+  width:100%;
+  max-height:88vh;
+  overflow:auto;
+  padding:18px 22px 20px;
+  box-shadow:0 10px 40px rgba(0,0,0,.45);
+}
+#kb h2{ font-family:'Barlow Condensed', sans-serif; font-size:24px; margin:0 0 10px; }
+#kb .kb-grid{ display:grid; grid-template-columns:1fr 1fr; gap:4px 28px; }
+#kb .kb-h{ grid-column:1 / -1; font-family:'Barlow Condensed', sans-serif; font-weight:700; font-size:15px; text-transform:uppercase; letter-spacing:.6px; color:var(--red); margin-top:10px; border-bottom:1px solid #eee; padding-bottom:2px; }
+#kb .kb-row{ display:flex; justify-content:space-between; gap:10px; font-size:14px; padding:2px 0; }
+#kb kbd{ background:#f2f2f2; border:1px solid #ccc; border-bottom-width:2px; border-radius:3px; padding:0 6px; font:600 12.5px 'Barlow Condensed', sans-serif; white-space:nowrap; }
+#kb .kb-close{ float:right; background:var(--red); color:#fff; border:none; border-radius:3px; padding:5px 12px; font:600 14px 'Barlow Condensed', sans-serif; cursor:pointer; }
+@media (max-width:640px){ #kb .kb-grid{ grid-template-columns:1fr; } }
+.save-status .kb-link{ text-decoration:underline; cursor:pointer; }
+
+/* ---------- view mode (saved HTML copy) ---------- */
+body.view-mode .editable{ cursor:default; outline:none !important; background:transparent !important; }
+body.view-mode .section-header button,
+body.view-mode .cell-del, body.view-mode .row-del, body.view-mode .sig-clear,
+body.view-mode .group-controls, body.view-mode .canvas-hint,
+body.view-mode .drop-zone, body.view-mode .add-group-row,
+body.view-mode .rh, body.view-mode #ptb{ display:none !important; }
+body.view-mode .photo-canvas:empty:before{ content:''; padding:0; }
+body.view-mode .photo-item .photo-wrap{ cursor:zoom-in; touch-action:pan-y; outline:none !important; }
+body.view-mode [contenteditable]:empty:before{ content:''; }
+
+/* ---------- print flow (built right before printing) ---------- */
+@media screen{ .pf{ display:none; } }
+.pf-row{ display:flex; align-items:flex-start; flex-wrap:nowrap; margin:0 0 12px 0; }
+.pf-item{ flex:0 0 auto; box-sizing:border-box; }
+.pf-item .img-box{ background:transparent; }
+.pf-item.has-border .img-box{ box-shadow:0 0 0 3px #232323; }
+
+/* =====================================================================
+   PRINT
+   ===================================================================== */
+@page{ size:letter; margin:.4in; }
 @media print{
-  .bottom-bar, .photo-controls, .cell-del, .row-del, .group-controls,
-  .drop-zone, .add-group-row, #lb, .save-status, .section-header button,
-  .resize-handle, .canvas-hint{ display:none !important; }
-  body{ background:#fff; padding-bottom:0; }
-  .section{ box-shadow:none; break-inside:avoid; }
-  .photo-item{ break-inside:avoid; }
-  .photo-canvas{ border:none; background:transparent; }
-  .photo-group{ border:none; padding:0; break-inside:avoid; }
-  .editable{ outline:none !important; background:transparent !important; }
+  html, body{ background:#fff; }
+  body{ padding-bottom:0 !important; }
+  .bottom-bar, .ptb, #lb, #kb, .photo-controls, .cell-del, .row-del, .group-controls,
+  .drop-zone, .add-group-row, .save-status, .section-header button,
+  .resize-handle, .canvas-hint, .sig-clear, .rh, .crop-layer, .mark-layer, .snap-guide{ display:none !important; }
   * { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+
+  header{ break-inside:avoid; break-after:avoid; padding:12px 16px; }
+  main{ padding:14px 0 0; }
+  .section{ box-shadow:none; overflow:visible !important; break-inside:auto; margin-bottom:16px; }
+  .section-header{ break-after:avoid; page-break-after:avoid; }
+  .section-body{ padding:16px; }
+  .info-cell, .checklist-item{ break-inside:avoid; page-break-inside:avoid; }
+  .summary-text{ orphans:3; widows:3; }
+  footer{ break-inside:avoid; }
+
+  .photo-group{ border:none; padding:0; margin-bottom:18px; break-inside:auto; }
+  .group-head, .group-desc{ break-after:avoid; page-break-after:avoid; }
+  .photo-group.has-pf .photo-canvas{ display:none !important; }
+  .photo-canvas{ border:none; background:transparent; }
+  .photo-canvas:empty:before{ content:'' !important; padding:0 !important; }
+  .photo-item{ break-inside:avoid; }
+  .pf-row{ break-inside:avoid; page-break-inside:avoid; }
+  .pf-item{ break-inside:avoid; page-break-inside:avoid; }
+  .photo-caption{ break-inside:avoid; }
+
+  .editable{ outline:none !important; background:transparent !important; }
+  [contenteditable]:empty:before{ content:'' !important; }
+  .checklist-item:has(.check-title:empty):has(.check-desc:empty){ display:none !important; }
+  .section:has(#checklist):not(:has(.check-title:not(:empty))):not(:has(.check-desc:not(:empty))){ display:none !important; }
+  .photo-item.selected .photo-wrap{ outline:none !important; }
 }
 
 </style>
@@ -574,56 +832,172 @@ footer .prepared-line{
   <div class="prepared-line" id="footerPreparedLine"></div>
 </footer>
 
-<div id="lb"><span class="lb-close" onclick="closeLB()">&times;</span><img id="lbImg" src=""></div>
+<div id="lb" aria-hidden="true">
+  <button class="lb-btn lb-close" type="button" aria-label="Close (Esc)" title="Close (Esc)">&times;</button>
+  <button class="lb-btn lb-prev" type="button" aria-label="Previous" title="Previous (Left arrow)">&#8249;</button>
+  <button class="lb-btn lb-next" type="button" aria-label="Next" title="Next (Right arrow)">&#8250;</button>
+  <div class="lb-view" id="lbView"><div class="lb-stage" id="lbStage"></div></div>
+  <div class="lb-cap" id="lbCap"></div>
+  <div class="lb-count" id="lbCount"></div>
+</div>
+
+<div id="ptb" class="ptb" hidden>
+  <div class="ptb-row ptb-main">
+    <span class="ptb-label">Photo</span>
+    <button type="button" data-act="enlarge" title="Enlarge (E or Enter, double-click)">Enlarge</button>
+    <button type="button" data-act="crop" title="Crop (C)">Crop</button>
+    <button type="button" data-act="rotl" title="Rotate left (Shift+R)">Rotate L</button>
+    <button type="button" data-act="rotr" title="Rotate right (R)">Rotate R</button>
+    <button type="button" data-act="fliph" title="Flip horizontal (H)">Flip H</button>
+    <button type="button" data-act="flipv" title="Flip vertical (V)">Flip V</button>
+    <button type="button" data-act="adjust" title="Brightness / contrast / saturation (A)">Adjust</button>
+    <button type="button" data-act="markup" title="Draw / arrow / box / text on the photo (M)">Markup</button>
+    <button type="button" data-act="border" title="Border (B)">Border</button>
+    <button type="button" data-act="lock" title="Lock position and size (L)">Lock</button>
+    <button type="button" data-act="front" title="Bring to front (Ctrl+])">Front</button>
+    <button type="button" data-act="back" title="Send to back (Ctrl+[)">Back</button>
+    <button type="button" data-act="dup" title="Duplicate (Ctrl+D)">Duplicate</button>
+    <button type="button" data-act="reset" title="Reset all edits (Ctrl+0)">Reset</button>
+    <button type="button" data-act="del" class="danger" title="Delete (Del)">Delete</button>
+  </div>
+  <div class="ptb-row ptb-sub" id="ptbSub" hidden></div>
+</div>
+
+<div id="kb" aria-hidden="true">
+  <div class="kb-card">
+    <button type="button" class="kb-close" id="kbClose">Close (Esc)</button>
+    <h2>Keyboard shortcuts</h2>
+    <div class="kb-grid">
+      <div class="kb-h">File</div>
+      <div class="kb-row"><span>Save a PDF</span><span><kbd>Ctrl</kbd> + <kbd>P</kbd></span></div>
+      <div class="kb-row"><span>Save an HTML copy (opens in view mode)</span><span><kbd>Ctrl</kbd> + <kbd>S</kbd></span></div>
+      <div class="kb-row"><span>Switch between view and edit mode</span><span><kbd>Ctrl</kbd> + <kbd>E</kbd></span></div>
+      <div class="kb-row"><span>Show this sheet</span><span><kbd>?</kbd> or <kbd>F1</kbd></span></div>
+
+      <div class="kb-h">Photos: select, move, copy</div>
+      <div class="kb-row"><span>Select a photo</span><span>Click</span></div>
+      <div class="kb-row"><span>Enlarge</span><span>Double-click, <kbd>E</kbd> or <kbd>Enter</kbd></span></div>
+      <div class="kb-row"><span>Copy / Cut / Paste</span><span><kbd>Ctrl</kbd> + <kbd>C</kbd> / <kbd>X</kbd> / <kbd>V</kbd></span></div>
+      <div class="kb-row"><span>Paste a picture from the clipboard</span><span><kbd>Ctrl</kbd> + <kbd>V</kbd></span></div>
+      <div class="kb-row"><span>Duplicate</span><span><kbd>Ctrl</kbd> + <kbd>D</kbd></span></div>
+      <div class="kb-row"><span>Delete</span><span><kbd>Del</kbd></span></div>
+      <div class="kb-row"><span>Nudge (10x with Shift)</span><span><kbd>Arrow keys</kbd></span></div>
+      <div class="kb-row"><span>Make bigger / smaller</span><span><kbd>+</kbd> / <kbd>-</kbd></span></div>
+      <div class="kb-row"><span>Bring to front / send to back</span><span><kbd>Ctrl</kbd> + <kbd>]</kbd> / <kbd>[</kbd></span></div>
+      <div class="kb-row"><span>Lock / unlock</span><span><kbd>L</kbd></span></div>
+      <div class="kb-row"><span>Turn snapping off while dragging</span><span>Hold <kbd>Alt</kbd></span></div>
+      <div class="kb-row"><span>Deselect</span><span><kbd>Esc</kbd></span></div>
+
+      <div class="kb-h">Photos: edit</div>
+      <div class="kb-row"><span>Crop (Enter applies, Esc cancels)</span><span><kbd>C</kbd></span></div>
+      <div class="kb-row"><span>Rotate right / left</span><span><kbd>R</kbd> / <kbd>Shift</kbd> + <kbd>R</kbd></span></div>
+      <div class="kb-row"><span>Flip horizontal / vertical</span><span><kbd>H</kbd> / <kbd>V</kbd></span></div>
+      <div class="kb-row"><span>Brightness / contrast</span><span><kbd>A</kbd></span></div>
+      <div class="kb-row"><span>Markup (pen, arrow, box, oval, text)</span><span><kbd>M</kbd></span></div>
+      <div class="kb-row"><span>Border on / off</span><span><kbd>B</kbd></span></div>
+      <div class="kb-row"><span>Reset all edits on the photo</span><span><kbd>Ctrl</kbd> + <kbd>0</kbd></span></div>
+      <div class="kb-row"><span>Undo / Redo (photo changes)</span><span><kbd>Ctrl</kbd> + <kbd>Z</kbd> / <kbd>Y</kbd></span></div>
+
+      <div class="kb-h">Typing in a text box</div>
+      <div class="kb-row"><span>Bold / Italic / Underline</span><span><kbd>Ctrl</kbd> + <kbd>B</kbd> / <kbd>I</kbd> / <kbd>U</kbd></span></div>
+      <div class="kb-row"><span>Undo / Redo / Select all</span><span><kbd>Ctrl</kbd> + <kbd>Z</kbd> / <kbd>Y</kbd> / <kbd>A</kbd></span></div>
+      <div class="kb-row"><span>Copy / Cut / Paste (plain text)</span><span><kbd>Ctrl</kbd> + <kbd>C</kbd> / <kbd>X</kbd> / <kbd>V</kbd></span></div>
+
+      <div class="kb-h">Enlarged view</div>
+      <div class="kb-row"><span>Next / previous</span><span><kbd>&rarr;</kbd> / <kbd>&larr;</kbd></span></div>
+      <div class="kb-row"><span>Zoom in / out</span><span>Click the picture</span></div>
+      <div class="kb-row"><span>Close</span><span><kbd>Esc</kbd></span></div>
+    </div>
+  </div>
+</div>
 
 <div class="bottom-bar">
   <button class="btn" onclick="savePDF()">Save as PDF</button>
-  <button class="btn outline" onclick="downloadHTML()">Download Final Report (HTML)</button>
-  <button class="btn ghost" onclick="clearForm()">Clear Form</button>
   <div class="save-status" id="saveStatus"></div>
 </div>
 
 <script>
 
 /* ===================== YSD Editable Daily Safety Report ===================== */
-/* Everything below runs standalone in the browser. No server, no Claude needed. */
+/* Runs standalone in the browser. No server needed. */
 
-const STORAGE_KEY = 'ysd_daily_report_autosave_v1';
+const STORAGE_KEY = 'ysd_daily_report_autosave_v3';
+try{ localStorage.removeItem('ysd_daily_report_autosave_v2'); localStorage.removeItem('ysd_daily_report_autosave_v1'); }catch(e){}
+const HINT = 'Ctrl+S saves an HTML copy  |  Ctrl+P saves a PDF  |  <span class="kb-link" onclick="toggleKB()">Press ? for all shortcuts</span>';
+const VIEW_HINT = 'Saved copy (view mode): click any photo to enlarge  |  Ctrl+E to edit  |  Ctrl+P saves a PDF';
+let viewMode = false;
 
-/* ---------- plain-text paste for all editable fields ---------- */
+const $ = (s, r) => (r || document).querySelector(s);
+const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const r2 = v => Math.round(v * 100) / 100;
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function isTyping(t){
+  return !!(t && t.closest && (t.closest('[contenteditable="true"]') || t.closest('input,textarea,select')));
+}
+
+/* ---------- paste: plain text in text boxes, pictures / copied photos elsewhere ---------- */
+let photoClip = null;
+const CLIP_MARK = 'YSD-PHOTO-CLIPBOARD';
 document.addEventListener('paste', function(e){
-  const t = e.target.closest('[contenteditable]');
-  if(!t) return;
-  e.preventDefault();
-  const text = (e.clipboardData || window.clipboardData).getData('text/plain');
-  document.execCommand('insertText', false, text);
+  const t = e.target && e.target.closest ? e.target.closest('[contenteditable="true"]') : null;
+  const cd = e.clipboardData || window.clipboardData;
+  if(t){
+    e.preventDefault();
+    const text = cd.getData('text/plain');
+    document.execCommand('insertText', false, text);
+    return;
+  }
+  if(viewMode || !cd) return;
+  const files = Array.from(cd.files || []).filter(isLikelyImageFile);
+  if(files.length){
+    e.preventDefault();
+    handleFiles(files, targetGroupId());
+    return;
+  }
+  const text = cd.getData('text/plain') || '';
+  if(photoClip && (text === '' || text === CLIP_MARK)){
+    e.preventDefault();
+    pastePhoto();
+  }
+});
+document.addEventListener('copy', function(e){
+  if(viewMode || isTyping(e.target)) return;
+  const sel = window.getSelection();
+  if(selected && sel && sel.isCollapsed){
+    photoClip = itemState(selected);
+    e.clipboardData.setData('text/plain', CLIP_MARK);
+    e.preventDefault();
+    flashStatus('Photo copied. Press Ctrl+V to paste it.');
+  }
+});
+document.addEventListener('cut', function(e){
+  if(viewMode || isTyping(e.target)) return;
+  const sel = window.getSelection();
+  if(selected && sel && sel.isCollapsed){
+    photoClip = itemState(selected);
+    e.clipboardData.setData('text/plain', CLIP_MARK);
+    e.preventDefault();
+    deleteSelected();
+    flashStatus('Photo cut. Press Ctrl+V to paste it.');
+  }
 });
 
 /* ---------- image loading: resize + compress via canvas, EXIF-safe ---------- */
-/* iPhones often save photos as HEIC/HEIF. iOS browsers can decode that format
-   natively (so photos added from a phone "just work"), but most desktop
-   browsers (Chrome, Edge, Firefox on Windows/Mac/Linux) cannot decode it at
-   all — that mismatch is the usual reason a photo uploads fine from a phone
-   but fails on a computer. We try, in order: (1) a HEIC->JPEG conversion
-   library loaded on demand (works when the format is HEIC and the computer
-   has internet), (2) two native browser decode attempts, (3) a classic
-   <img> element decode (succeeds in a few cases the others don't). Only if
-   every attempt fails do we give up on that photo, with a specific,
-   actionable message rather than a generic error. */
-
+/* iPhones often save photos as HEIC/HEIF. iOS browsers decode that natively,
+   most desktop browsers cannot. We try a HEIC->JPEG converter first, then native
+   decoders, and only then show a specific message. */
 function looksLikeHeic(file){
   const t = (file.type || '').toLowerCase();
   if(t === 'image/heic' || t === 'image/heif' || t === 'image/heic-sequence' || t === 'image/heif-sequence') return true;
   return /\.(heic|heif)$/i.test(file.name || '');
 }
-
 function isLikelyImageFile(file){
   const t = (file.type || '').toLowerCase();
   if(t.startsWith('image/')) return true;
   if(t === '') return /\.(jpe?g|png|gif|webp|bmp|heic|heif|tiff?)$/i.test(file.name || '');
   return false;
 }
-
 let heic2anyLoadPromise = null;
 function loadHeic2Any(){
   if(typeof window.heic2any === 'function') return Promise.resolve(true);
@@ -640,11 +1014,6 @@ function loadHeic2Any(){
   });
   return heic2anyLoadPromise;
 }
-
-/* If this looks like a HEIC/HEIF photo, try converting it to a JPEG Blob
-   first (needs internet the first time; harmless no-op if unavailable or
-   the file isn't actually HEIC). Never throws — worst case, returns the
-   original file unchanged so the normal decode attempts can still try it. */
 async function maybeConvertHeic(file){
   if(!looksLikeHeic(file)) return file;
   try{
@@ -657,7 +1026,6 @@ async function maybeConvertHeic(file){
     return file;
   }
 }
-
 function decodeViaImgElement(file){
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(file);
@@ -667,42 +1035,38 @@ function decodeViaImgElement(file){
     img.src = url;
   });
 }
-
 async function decodeToDrawable(file){
   try{ return await createImageBitmap(file, {imageOrientation:'from-image'}); }catch(e){}
   try{ return await createImageBitmap(file); }catch(e){}
   try{ return await decodeViaImgElement(file); }catch(e){}
   return null;
 }
-
+/* returns {url, w, h} */
 async function fileToDataURL(file, maxDim, quality){
   maxDim = maxDim || 1600;
   quality = quality || 0.85;
-
   const workingFile = await maybeConvertHeic(file);
   const drawable = await decodeToDrawable(workingFile);
-
   if(!drawable){
     if(looksLikeHeic(file)){
       const err = new Error('HEIC_UNSUPPORTED');
       err.isHeic = true;
       throw err;
     }
-    // last resort for a non-HEIC file: embed the raw bytes as-is
-    return await fileToDataURLFallback(workingFile);
+    const url = await fileToDataURLFallback(workingFile);
+    const dims = await imageDims(url);
+    return { url, w: dims.w, h: dims.h };
   }
-
   const srcW = drawable.width || drawable.naturalWidth;
   const srcH = drawable.height || drawable.naturalHeight;
   const scale = Math.min(1, maxDim / Math.max(srcW, srcH));
   const w = Math.max(1, Math.round(srcW * scale));
   const h = Math.max(1, Math.round(srcH * scale));
-  const canvasEl = document.createElement('canvas');
-  canvasEl.width = w; canvasEl.height = h;
-  const ctx = canvasEl.getContext('2d');
-  ctx.drawImage(drawable, 0, 0, w, h);
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  c.getContext('2d').drawImage(drawable, 0, 0, w, h);
   if(drawable.close) drawable.close();
-  return canvasEl.toDataURL('image/jpeg', quality);
+  return { url: c.toDataURL('image/jpeg', quality), w, h };
 }
 function fileToDataURLFallback(file){
   return new Promise((resolve, reject) => {
@@ -712,14 +1076,41 @@ function fileToDataURLFallback(file){
     reader.readAsDataURL(file);
   });
 }
+function imageDims(url){
+  return new Promise((resolve, reject) => {
+    const im = new Image();
+    im.onload = () => resolve({ w: im.naturalWidth || 1, h: im.naturalHeight || 1 });
+    im.onerror = reject;
+    im.src = url;
+  });
+}
 
-/* ---------- lightbox ---------- */
-const lb = document.getElementById('lb');
-const lbImg = document.getElementById('lbImg');
-function openLB(src){ lbImg.src = src; lb.classList.add('open'); }
-function closeLB(){ lb.classList.remove('open'); lbImg.src=''; }
-lb.addEventListener('click', function(e){ if(e.target === lb) closeLB(); });
-document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeLB(); });
+/* ---------- status line under the Save button ---------- */
+let statusTimer = null;
+function flashStatus(msg){
+  const el = document.getElementById('saveStatus');
+  if(!el) return;
+  el.textContent = msg;
+  clearTimeout(statusTimer);
+  statusTimer = setTimeout(showHint, 5000);
+}
+function showHint(){
+  const el = document.getElementById('saveStatus');
+  if(el) el.innerHTML = viewMode ? VIEW_HINT : HINT;
+}
+
+/* ---------- view / edit mode ---------- */
+function setViewMode(v){
+  viewMode = !!v;
+  document.body.classList.toggle('view-mode', viewMode);
+  $$('.editable').forEach(el => el.setAttribute('contenteditable', viewMode ? 'false' : 'true'));
+  if(viewMode){ deselect(); endMode(false); }
+  showHint();
+}
+function toggleMode(){
+  setViewMode(!viewMode);
+  flashStatus(viewMode ? 'View mode: click any photo to enlarge.' : 'Edit mode on.');
+}
 
 /* ---------- Project Info fields ---------- */
 function addInfoField(){
@@ -747,50 +1138,244 @@ function addChecklistItem(){
   scheduleSave();
 }
 
-/* ---------- Photo Documentation: free-form drag & resize canvas ---------- */
+/* =====================================================================
+   PHOTO MODEL
+   Every photo stores its edits as data-* attributes (so autosave and the
+   saved HTML copy keep them):
+     x,y,w  position / width as % of the group canvas width
+     z      stacking order           nw,nh  source pixel size
+     rot    0/90/180/270             fx,fy  1 or -1 (flip)
+     crop   "l,t,r,b" fractions      adj    "brightness,contrast,saturation,gray"
+     border 0/1   lock 0/1   marks  JSON (pen / arrow / box / oval / text)
+   The picture itself is drawn from percentages only, so it looks identical
+   on screen, in the enlarged view and in the PDF.
+   ===================================================================== */
+const srcStore = new Map();        // photo id -> data URL (for undo of deletes)
 let groupCounter = 0;
-let topZ = 1000;
-const DEFAULT_W_PCT = 30;   // default photo width, as % of canvas width
-const MIN_W_PX = 80;
+const MIN_W_PX = 70;
+const DEFAULT_W_PCT = 31;
 
-function addPhotoGroup(titleText){
-  groupCounter++;
-  const gid = 'g' + groupCounter + '_' + Date.now();
-  const container = document.getElementById('photoGroups');
-  const group = document.createElement('div');
-  group.className = 'photo-group';
-  group.dataset.gid = gid;
-  group.innerHTML =
-    '<div class="group-head">' +
-      '<div class="group-title editable" contenteditable="true" data-ph="Group Title (e.g. PPE Compliance)">' + (titleText||'') + '</div>' +
+function newPid(){ return 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+
+function P(item){
+  const d = item.dataset;
+  const crop = (d.crop || '0,0,0,0').split(',').map(Number);
+  const adj = (d.adj || '100,100,100,0').split(',').map(Number);
+  let marks = [];
+  try{ marks = JSON.parse(d.marks || '[]'); }catch(e){ marks = []; }
+  return {
+    pid: d.pid, x: +d.x || 0, y: +d.y || 0, w: +d.w || DEFAULT_W_PCT, z: d.z === undefined ? 1 : +d.z,
+    nw: +d.nw || 4, nh: +d.nh || 3, rot: ((+d.rot || 0) % 360 + 360) % 360,
+    fx: +d.fx === -1 ? -1 : 1, fy: +d.fy === -1 ? -1 : 1,
+    crop: crop.length === 4 ? crop : [0,0,0,0], adj: adj.length === 4 ? adj : [100,100,100,0],
+    border: +d.border || 0, lock: +d.lock || 0, marks
+  };
+}
+function dispAspect(p, cropOverride){
+  const c = cropOverride || p.crop;
+  const cw = p.nw * (1 - c[0] - c[2]);
+  const ch = p.nh * (1 - c[1] - c[3]);
+  return (p.rot % 180 === 0) ? cw / ch : ch / cw;
+}
+function itemState(item){
+  const d = item.dataset;
+  const cap = item.querySelector('.photo-caption');
+  return {
+    pid: d.pid, x: d.x, y: d.y, w: d.w, z: d.z, nw: d.nw, nh: d.nh, rot: d.rot, fx: d.fx, fy: d.fy,
+    crop: d.crop, adj: d.adj, border: d.border, lock: d.lock, marks: d.marks,
+    cap: cap ? cap.innerHTML : ''
+  };
+}
+function applyDataset(item, st){
+  ['x','y','w','z','nw','nh','rot','fx','fy','crop','adj','border','lock','marks'].forEach(k => {
+    if(st[k] !== undefined && st[k] !== null) item.dataset[k] = st[k];
+  });
+}
+
+/* Draw the picture inside .img-box using only percentages */
+function cropToDisplayRect(p){
+  const [cl, ct, cr, cb] = p.crop;
+  const pts = [[cl, ct], [1 - cr, 1 - cb]].map(([a, b]) => {
+    let u, v;
+    if(p.rot === 0){ u = a; v = b; }
+    else if(p.rot === 90){ u = 1 - b; v = a; }
+    else if(p.rot === 180){ u = 1 - a; v = 1 - b; }
+    else { u = b; v = 1 - a; }
+    if(p.fx === -1) u = 1 - u;
+    if(p.fy === -1) v = 1 - v;
+    return [u, v];
+  });
+  return { u0: Math.min(pts[0][0], pts[1][0]), v0: Math.min(pts[0][1], pts[1][1]),
+           u1: Math.max(pts[0][0], pts[1][0]), v1: Math.max(pts[0][1], pts[1][1]) };
+}
+function displayRectToCrop(p, rect){
+  const pts = [[rect.u0, rect.v0], [rect.u1, rect.v1]].map(([u, v]) => {
+    if(p.fx === -1) u = 1 - u;
+    if(p.fy === -1) v = 1 - v;
+    let a, b;
+    if(p.rot === 0){ a = u; b = v; }
+    else if(p.rot === 90){ a = v; b = 1 - u; }
+    else if(p.rot === 180){ a = 1 - u; b = 1 - v; }
+    else { a = 1 - v; b = u; }
+    return [a, b];
+  });
+  const a0 = Math.min(pts[0][0], pts[1][0]), a1 = Math.max(pts[0][0], pts[1][0]);
+  const b0 = Math.min(pts[0][1], pts[1][1]), b1 = Math.max(pts[0][1], pts[1][1]);
+  return [r4(a0), r4(b0), r4(1 - a1), r4(1 - b1)];
+}
+function r4(v){ return Math.round(clamp(v, 0, 1) * 10000) / 10000; }
+
+function renderBox(item, opts){
+  opts = opts || {};
+  const p = P(item);
+  const crop = opts.cropOverride || p.crop;
+  const box = item.querySelector('.img-box');
+  const img = box.querySelector('img.pimg');
+  const svg = box.querySelector('svg.marks');
+  const A = dispAspect(p, crop);
+  box.style.aspectRatio = A.toFixed(5);
+  const cwF = 1 - crop[0] - crop[2], chF = 1 - crop[1] - crop[3];
+  const cw = p.nw * cwF, ch = p.nh * chF;
+  let iw, ih;
+  if(p.rot % 180 === 0){ iw = p.nw / cw * 100; ih = p.nh / ch * 100; }
+  else { iw = p.nw / ch * 100; ih = p.nh / cw * 100; }
+  const tx = (crop[2] - crop[0]) / 2 * 100;
+  const ty = (crop[3] - crop[1]) / 2 * 100;
+  img.style.width = iw.toFixed(4) + '%';
+  img.style.height = ih.toFixed(4) + '%';
+  img.style.transform = 'translate(-50%,-50%) scale(' + p.fx + ',' + p.fy + ') rotate(' + p.rot + 'deg) translate(' + tx.toFixed(4) + '%,' + ty.toFixed(4) + '%)';
+  const a = p.adj;
+  const f = [];
+  if(a[0] !== 100) f.push('brightness(' + a[0] + '%)');
+  if(a[1] !== 100) f.push('contrast(' + a[1] + '%)');
+  if(a[2] !== 100) f.push('saturate(' + a[2] + '%)');
+  if(a[3] > 0) f.push('grayscale(' + a[3] + '%)');
+  img.style.filter = f.length ? f.join(' ') : '';
+  item.classList.toggle('has-border', !!p.border);
+  item.classList.toggle('locked', !!p.lock);
+  if(svg){
+    const m = opts.noMarks ? { vb: '0 0 1000 ' + (1000 / A).toFixed(1), html: '' } : marksSVG(p.marks.concat(opts.draft ? [opts.draft] : []), A);
+    svg.setAttribute('viewBox', m.vb);
+    svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+    svg.innerHTML = m.html;
+  }
+}
+
+function marksSVG(marks, A){
+  const W = 1000, H = 1000 / A;
+  const X = x => (x * W).toFixed(1), Y = y => (y * H).toFixed(1);
+  let s = '';
+  marks.forEach(m => {
+    const c = m.c || '#CC1B1B', sw = m.w || 6;
+    const stroke = 'fill="none" stroke="' + c + '" stroke-width="' + sw + '" stroke-linecap="round" stroke-linejoin="round"';
+    if(m.t === 'pen' && m.pts && m.pts.length > 1){
+      s += '<polyline ' + stroke + ' points="' + m.pts.map(q => X(q[0]) + ',' + Y(q[1])).join(' ') + '"/>';
+    } else if(m.t === 'rect'){
+      const x0 = Math.min(m.a[0], m.b[0]), x1 = Math.max(m.a[0], m.b[0]), y0 = Math.min(m.a[1], m.b[1]), y1 = Math.max(m.a[1], m.b[1]);
+      s += '<rect ' + stroke + ' x="' + X(x0) + '" y="' + Y(y0) + '" width="' + ((x1 - x0) * W).toFixed(1) + '" height="' + ((y1 - y0) * H).toFixed(1) + '"/>';
+    } else if(m.t === 'ell'){
+      const x0 = Math.min(m.a[0], m.b[0]), x1 = Math.max(m.a[0], m.b[0]), y0 = Math.min(m.a[1], m.b[1]), y1 = Math.max(m.a[1], m.b[1]);
+      s += '<ellipse ' + stroke + ' cx="' + X((x0 + x1) / 2) + '" cy="' + Y((y0 + y1) / 2) + '" rx="' + ((x1 - x0) * W / 2).toFixed(1) + '" ry="' + ((y1 - y0) * H / 2).toFixed(1) + '"/>';
+    } else if(m.t === 'arrow'){
+      const ax = m.a[0] * W, ay = m.a[1] * H, bx = m.b[0] * W, by = m.b[1] * H;
+      const ang = Math.atan2(by - ay, bx - ax), len = Math.max(26, sw * 5);
+      const h1 = [bx - len * Math.cos(ang - 0.45), by - len * Math.sin(ang - 0.45)];
+      const h2 = [bx - len * Math.cos(ang + 0.45), by - len * Math.sin(ang + 0.45)];
+      s += '<line ' + stroke + ' x1="' + ax.toFixed(1) + '" y1="' + ay.toFixed(1) + '" x2="' + bx.toFixed(1) + '" y2="' + by.toFixed(1) + '"/>';
+      s += '<polygon fill="' + c + '" stroke="' + c + '" stroke-width="2" stroke-linejoin="round" points="' + bx.toFixed(1) + ',' + by.toFixed(1) + ' ' + h1[0].toFixed(1) + ',' + h1[1].toFixed(1) + ' ' + h2[0].toFixed(1) + ',' + h2[1].toFixed(1) + '"/>';
+    } else if(m.t === 'text' && m.v){
+      const fs = m.s || 44;
+      s += '<text x="' + X(m.a[0]) + '" y="' + Y(m.a[1]) + '" font-size="' + fs + '" font-weight="700" fill="' + c + '" stroke="#fff" stroke-width="' + (fs * 0.14).toFixed(1) + '" paint-order="stroke" stroke-linejoin="round" dominant-baseline="hanging">' + esc(m.v) + '</text>';
+    }
+  });
+  return { vb: '0 0 ' + W + ' ' + H.toFixed(1), html: s };
+}
+
+/* position / size an item from data-x / data-y / data-w */
+function layoutItem(item){
+  const canvasEl = item.parentElement;
+  if(!canvasEl) return;
+  const cw = canvasEl.clientWidth || canvasEl.getBoundingClientRect().width || 600;
+  const p = P(item);
+  item.style.width = Math.max(MIN_W_PX, cw * p.w / 100) + 'px';
+  item.style.left = (cw * p.x / 100) + 'px';
+  item.style.top = (cw * p.y / 100) + 'px';
+  item.style.zIndex = p.z;
+  renderBox(item, item.classList.contains('cropping') ? { cropOverride: [0,0,0,0], noMarks: true } : {});
+}
+function recalcCanvasHeight(canvasEl){
+  if(!canvasEl) return;
+  let maxBottom = 0;
+  $$(':scope > .photo-item', canvasEl).forEach(it => {
+    maxBottom = Math.max(maxBottom, (parseFloat(it.style.top) || 0) + it.offsetHeight);
+  });
+  canvasEl.style.minHeight = (maxBottom > 0 ? maxBottom + 20 : 60) + 'px';
+}
+function rescaleAllCanvases(){
+  $$('.photo-canvas').forEach(canvasEl => {
+    $$(':scope > .photo-item', canvasEl).forEach(layoutItem);
+    recalcCanvasHeight(canvasEl);
+  });
+}
+let resizeRaf = null;
+window.addEventListener('resize', function(){
+  if(resizeRaf) cancelAnimationFrame(resizeRaf);
+  resizeRaf = requestAnimationFrame(function(){ rescaleAllCanvases(); if(lbOpen()) sizeLB(); });
+});
+window.addEventListener('orientationchange', function(){ setTimeout(rescaleAllCanvases, 200); });
+function updatePhotoCount(){
+  const count = $$('.photo-item').length;
+  const label = document.getElementById('photoCountLabel');
+  if(label) label.textContent = '(' + count + (count === 1 ? ' Image' : ' Images') + ')';
+}
+
+/* ---------- photo groups ---------- */
+function groupInner(title, desc, gid){
+  return '<div class="group-head">' +
+      '<div class="group-title editable" contenteditable="true" data-ph="Group Title (e.g. PPE Compliance)">' + (title || '') + '</div>' +
       '<div class="group-controls">' +
+        '<select class="arr-sel" title="Auto-arrange the photos in this group" onchange="arrangeFromSelect(this)">' +
+          '<option value="">Arrange...</option><option value="1">1 per row</option><option value="2">2 per row</option><option value="3">3 per row</option><option value="4">4 per row</option>' +
+        '</select>' +
         '<button class="btn small outline" onclick="moveGroup(this,-1)" title="Move up">↑</button>' +
         '<button class="btn small outline" onclick="moveGroup(this,1)" title="Move down">↓</button>' +
         '<button class="btn small ghost" onclick="removeGroup(this)" title="Remove group">✕ Group</button>' +
       '</div>' +
     '</div>' +
-    '<div class="group-desc editable" contenteditable="true" data-ph="Short description of what this group of photos shows..."></div>' +
-    '<div class="canvas-hint">Drag a photo to move it anywhere in the box below. Tap a photo to select it (red outline), then drag the red handle to resize, or tap View to see it full-size.</div>' +
+    '<div class="group-desc editable" contenteditable="true" data-ph="Short description of what this group of photos shows...">' + (desc || '') + '</div>' +
+    '<div class="canvas-hint">Click a photo to select it: drag to move, drag a corner to resize, use the toolbar to crop, flip, rotate and more. Double-click to enlarge.</div>' +
     '<div class="photo-canvas" id="canvas_' + gid + '"></div>' +
-    '<div class="drop-zone" id="drop_' + gid + '">Drag photos here, or tap "Add Photos" below to choose from your Photo Library, Files, or camera' +
+    '<div class="drop-zone" id="drop_' + gid + '">Drag photos here, or use the button below' +
       '<div style="margin-top:10px;">' +
         '<button class="btn small" onclick="triggerFileInput(\'' + gid + '\')">+ Add Photos</button>' +
         '<input type="file" id="file_' + gid + '" accept="image/*" multiple style="display:none" onchange="handleFiles(this.files, \'' + gid + '\'); this.value=\'\';">' +
       '</div>' +
     '</div>';
-  container.appendChild(group);
+}
+function createGroupEl(gid, title, desc){
+  const group = document.createElement('div');
+  group.className = 'photo-group';
+  group.dataset.gid = gid;
+  group.innerHTML = groupInner(title, desc, gid);
+  return group;
+}
+function addPhotoGroup(titleText){
+  groupCounter++;
+  const gid = 'g' + groupCounter + '_' + Date.now();
+  const group = createGroupEl(gid, titleText || '', '');
+  document.getElementById('photoGroups').appendChild(group);
   wireDropZone(gid);
-  scheduleSave();
+  lastGid = gid;
+  commit();
   return gid;
 }
-
 function removeGroup(btn){
   if(!confirm('Remove this entire photo group and its photos?')) return;
+  deselect();
   btn.closest('.photo-group').remove();
   updatePhotoCount();
-  scheduleSave();
+  commit();
 }
-
 function moveGroup(btn, dir){
   const group = btn.closest('.photo-group');
   const container = group.parentElement;
@@ -799,28 +1384,33 @@ function moveGroup(btn, dir){
   } else if(dir === 1 && group.nextElementSibling){
     container.insertBefore(group.nextElementSibling, group);
   }
-  scheduleSave();
+  commit();
+}
+function triggerFileInput(gid){ document.getElementById('file_' + gid).click(); }
+let lastGid = null;
+function targetGroupId(){
+  if(selected){ const g = selected.closest('.photo-group'); if(g) return g.dataset.gid; }
+  if(lastGid && document.getElementById('canvas_' + lastGid)) return lastGid;
+  const gs = $$('.photo-group');
+  if(gs.length) return gs[gs.length - 1].dataset.gid;
+  return addPhotoGroup('');
 }
 
-function triggerFileInput(gid){
-  document.getElementById('file_' + gid).click();
-}
-
+/* ---------- adding photos ---------- */
 async function handleFiles(fileList, gid){
   const files = Array.from(fileList).filter(isLikelyImageFile);
   if(!files.length) return;
-  flashStatus('Adding ' + files.length + (files.length===1?' photo':' photos') + '… (this can take a few seconds for iPhone photos)');
-
-  const heicFailures = [];
-  const otherFailures = [];
+  lastGid = gid;
+  flashStatus('Adding ' + files.length + (files.length === 1 ? ' photo' : ' photos') + '... (this can take a few seconds for iPhone photos)');
+  const heicFailures = [], otherFailures = [];
+  let last = null;
   for(const file of files){
     try{
-      const dataUrl = await fileToDataURL(file, 1600, 0.85);
-      addPhotoToCanvas(gid, dataUrl);
+      const r = await fileToDataURL(file, 1600, 0.85);
+      last = addPhotoToCanvas(gid, r.url, r.w, r.h);
     }catch(err){
       console.error('Image load failed', file.name, err);
-      if(err && err.isHeic) heicFailures.push(file.name);
-      else otherFailures.push(file.name);
+      if(err && err.isHeic) heicFailures.push(file.name); else otherFailures.push(file.name);
     }
   }
   if(heicFailures.length || otherFailures.length){
@@ -835,318 +1425,992 @@ async function handleFiles(fileList, gid){
     }
     if(otherFailures.length){
       if(msg) msg += '\n\n';
-      msg += (otherFailures.length === 1 ? 'This photo' : 'These photos') + ' could not be loaded: ' +
-        otherFailures.join(', ') + '. Try a different file.';
+      msg += (otherFailures.length === 1 ? 'This photo' : 'These photos') + ' could not be loaded: ' + otherFailures.join(', ') + '. Try a different file.';
     }
     alert(msg);
   }
   updatePhotoCount();
-  scheduleSave();
+  if(last) selectItem(last);
+  commit();
+  showHint();
 }
 
-/* Create a new photo item, give it a default cascading position, and wire up drag/resize. */
-function addPhotoToCanvas(gid, dataUrl, xPct, yPct, wPct){
-  const canvasEl = document.getElementById('canvas_' + gid);
+function itemInner(src, capHTML){
+  return '<div class="photo-wrap">' +
+      '<div class="img-box"><img class="pimg" draggable="false" alt="" src="' + src + '"><svg class="marks" xmlns="http://www.w3.org/2000/svg"></svg></div>' +
+      '<i class="rh nw" data-c="nw"></i><i class="rh ne" data-c="ne"></i><i class="rh sw" data-c="sw"></i><i class="rh se" data-c="se"></i>' +
+    '</div>' +
+    '<div class="photo-caption editable" contenteditable="true" data-ph="Fig. — describe this photo">' + (capHTML || '') + '</div>';
+}
+function createItemEl(canvasEl, pid, src, capHTML){
   const item = document.createElement('div');
   item.className = 'photo-item';
-  item.innerHTML =
-    '<div class="photo-wrap">' +
-      '<img src="' + dataUrl + '">' +
-      '<div class="photo-controls">' +
-        '<button class="view-btn" onclick="viewPhoto(this)" title="View full-size">View</button>' +
-        '<button class="danger" onclick="removePhoto(this)" title="Delete photo">✕</button>' +
-      '</div>' +
-      '<div class="resize-handle" title="Drag to resize"></div>' +
-    '</div>' +
-    '<div class="photo-caption editable" contenteditable="true" data-ph="Fig. — describe this photo"></div>';
+  item.dataset.pid = pid;
+  item.innerHTML = itemInner(src, capHTML);
   canvasEl.appendChild(item);
-
-  if(xPct === undefined){
-    const existingCount = canvasEl.querySelectorAll('.photo-item').length - 1;
-    const perRow = 3;
-    const col = existingCount % perRow;
-    const row = Math.floor(existingCount / perRow);
-    xPct = col * (DEFAULT_W_PCT + 3);
-    yPct = row * 24;
-    wPct = DEFAULT_W_PCT;
-  }
-  item.dataset.x = xPct;
-  item.dataset.y = yPct;
-  item.dataset.w = wPct;
-
-  layoutItem(item);
-  enableDragResize(item, canvasEl);
-
-  const img = item.querySelector('img');
-  img.addEventListener('load', () => recalcCanvasHeight(canvasEl));
-  recalcCanvasHeight(canvasEl);
-
+  srcStore.set(pid, src);
   return item;
 }
-
-function removePhoto(btn){
-  const item = btn.closest('.photo-item');
-  const canvasEl = item.closest('.photo-canvas');
-  item.remove();
+function addPhotoToCanvas(gid, src, nw, nh, st){
+  const canvasEl = document.getElementById('canvas_' + gid);
+  if(!canvasEl) return null;
+  const pid = (st && st.pid) || newPid();
+  const item = createItemEl(canvasEl, pid, src, st ? st.cap : '');
+  const A0 = nw / nh;
+  const narrow = (canvasEl.clientWidth || 700) < 600;
+  const defW = narrow ? (A0 > 1.8 ? 100 : 48) : (A0 > 1.8 ? 48 : DEFAULT_W_PCT);
+  const base = { x: 0, y: 0, w: defW, z: nextZ(), nw: nw, nh: nh, rot: 0, fx: 1, fy: 1, crop: '0,0,0,0', adj: '100,100,100,0', border: 0, lock: 0, marks: '[]' };
+  applyDataset(item, Object.assign(base, st || {}));
+  if(!st || st.x === undefined){
+    const cw = canvasEl.clientWidth || 700;
+    const hPct = defW / A0 + 30 / cw * 100;
+    const spot = findSpot(canvasEl, defW, hPct, item);
+    item.dataset.x = r2(spot.x); item.dataset.y = r2(spot.y);
+  }
+  layoutItem(item);
   recalcCanvasHeight(canvasEl);
-  updatePhotoCount();
-  scheduleSave();
+  return item;
 }
-
-/* Position/size an item from its stored data-x/data-y/data-w (percent of canvas width). */
-function layoutItem(item){
-  const canvasEl = item.parentElement;
-  if(!canvasEl) return;
-  const cw = canvasEl.clientWidth || canvasEl.getBoundingClientRect().width || 600;
-  const x = parseFloat(item.dataset.x) || 0;
-  const y = parseFloat(item.dataset.y) || 0;
-  const w = parseFloat(item.dataset.w) || DEFAULT_W_PCT;
-  const widthPx = Math.max(MIN_W_PX, cw * w / 100);
-  item.style.width = widthPx + 'px';
-  item.style.left = (cw * x / 100) + 'px';
-  item.style.top = (cw * y / 100) + 'px';
+function nextZ(){
+  let z = 0;
+  $$('.photo-item').forEach(it => { z = Math.max(z, +it.dataset.z || 0); });
+  return z + 1;
 }
-
-/* Grow the canvas to fit the lowest photo so nothing is clipped. */
-function recalcCanvasHeight(canvasEl){
-  if(!canvasEl) return;
-  let maxBottom = 0;
-  canvasEl.querySelectorAll(':scope > .photo-item').forEach(it => {
-    const top = parseFloat(it.style.top) || 0;
-    maxBottom = Math.max(maxBottom, top + it.offsetHeight);
-  });
-  canvasEl.style.minHeight = (maxBottom > 0 ? maxBottom + 20 : 60) + 'px';
-}
-
-function updatePhotoCount(){
-  const count = document.querySelectorAll('.photo-item').length;
-  const label = document.getElementById('photoCountLabel');
-  if(label) label.textContent = '(' + count + (count === 1 ? ' Image' : ' Images') + ')';
-}
-
-/* ---------- selection: tap a photo to select it (red outline), which
-   reveals its resize handle and its View/Delete buttons. Dragging still
-   moves it; the "View" button opens it full-size. ---------- */
-function selectPhoto(item){
-  document.querySelectorAll('.photo-item.selected').forEach(el => {
-    if(el !== item) el.classList.remove('selected');
-  });
-  item.classList.add('selected');
-  item.style.zIndex = ++topZ;
-}
-function deselectAll(){
-  document.querySelectorAll('.photo-item.selected').forEach(el => el.classList.remove('selected'));
-}
-function viewPhoto(btn){
-  const item = btn.closest('.photo-item');
-  const img = item && item.querySelector('img');
-  if(img) openLB(img.src);
-}
-document.addEventListener('click', function(e){
-  const selectedItem = document.querySelector('.photo-item.selected');
-  if(!selectedItem) return;
-  if(e.target.closest('#lb')) return; // viewing/closing the full-size photo shouldn't clear the selection
-  if(!selectedItem.contains(e.target)) deselectAll();
-});
-
-/* ---------- keep a resize from silently overlapping a neighboring photo ---------- */
-function itemRect(el){
-  const left = parseFloat(el.style.left) || 0;
-  const top = parseFloat(el.style.top) || 0;
-  return { left, top, right: left + el.offsetWidth, bottom: top + el.offsetHeight };
-}
-function rectsOverlap(a, b){
-  return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
-}
-/* Returns the largest width <= targetWidth that doesn't make `item` overlap
-   any other photo in the same canvas (checked by actually measuring the DOM,
-   so it accounts for the image's real aspect ratio and the caption's real
-   wrapped height, not just an estimate). Falls back to the smallest allowed
-   width if even that already overlaps (e.g. a neighbor was dragged very close). */
-function clampWidthToAvoidOverlap(item, canvasEl, targetWidth){
-  const siblings = Array.prototype.filter.call(
-    canvasEl.querySelectorAll(':scope > .photo-item'), el => el !== item
-  );
-  if(!siblings.length) return targetWidth;
-  const siblingRects = siblings.map(itemRect);
-  const originalWidth = item.style.width;
-
-  function overlapsAt(w){
-    item.style.width = w + 'px';
-    const r = itemRect(item);
-    return siblingRects.some(sr => rectsOverlap(r, sr));
-  }
-
-  let result = targetWidth;
-  if(overlapsAt(targetWidth)){
-    if(overlapsAt(MIN_W_PX)){
-      result = MIN_W_PX; // can't shrink enough to clear it either — smallest we allow
-    }else{
-      let lo = MIN_W_PX, hi = targetWidth;
-      for(let i = 0; i < 10; i++){
-        const mid = (lo + hi) / 2;
-        if(overlapsAt(mid)) hi = mid; else lo = mid;
-      }
-      result = Math.floor(lo);
+/* first free slot (left-to-right, top-to-bottom) where a new photo fits */
+function findSpot(canvasEl, wPct, hPct, ignore){
+  const cw = canvasEl.clientWidth || 700;
+  const rects = $$(':scope > .photo-item', canvasEl).filter(it => it !== ignore).map(it => ({
+    x: +it.dataset.x || 0, y: +it.dataset.y || 0, w: +it.dataset.w || DEFAULT_W_PCT, h: it.offsetHeight / cw * 100
+  }));
+  const gap = 1.5;
+  const xs = new Set([0]), ys = new Set([0]);
+  rects.forEach(r => { xs.add(r.x + r.w + gap); ys.add(r.y + r.h + gap); });
+  const xl = Array.from(xs).filter(x => x + wPct <= 100.2).sort((a, b) => a - b);
+  const yl = Array.from(ys).sort((a, b) => a - b);
+  for(const y of yl){
+    for(const x of xl){
+      if(!rects.some(r => x < r.x + r.w && x + wPct > r.x && y < r.y + r.h && y + hPct > r.y)) return { x, y };
     }
   }
-  item.style.width = originalWidth;
-  return result;
+  return { x: 0, y: rects.reduce((m, r) => Math.max(m, r.y + r.h), 0) + gap };
+}
+function arrangeGroup(gid, cols){
+  const canvasEl = document.getElementById('canvas_' + gid);
+  if(!canvasEl) return;
+  const cw = canvasEl.clientWidth || 700;
+  const items = $$(':scope > .photo-item', canvasEl).sort((a, b) =>
+    ((+a.dataset.y || 0) - (+b.dataset.y || 0)) || ((+a.dataset.x || 0) - (+b.dataset.x || 0)));
+  const gap = 2, w = (100 - gap * (cols - 1)) / cols;
+  let col = 0, rowTop = 0, rowMax = 0;
+  items.forEach(it => {
+    it.dataset.w = r2(w);
+    layoutItem(it);
+    const h = it.offsetHeight / cw * 100;
+    if(col === cols){ col = 0; rowTop += rowMax + gap; rowMax = 0; }
+    it.dataset.x = r2(col * (w + gap));
+    it.dataset.y = r2(rowTop);
+    rowMax = Math.max(rowMax, h);
+    col++;
+    layoutItem(it);
+  });
+  recalcCanvasHeight(canvasEl);
+  commit();
+}
+function arrangeFromSelect(sel){
+  const cols = parseInt(sel.value, 10);
+  sel.value = '';
+  if(!cols) return;
+  const g = sel.closest('.photo-group');
+  if(g) arrangeGroup(g.dataset.gid, cols);
 }
 
-/* Drag-to-move and drag-corner-to-resize, via Pointer Events (mouse + touch + pen). */
-function enableDragResize(item, canvasEl){
-  const wrap = item.querySelector('.photo-wrap');
-  const handle = item.querySelector('.resize-handle');
-  let dragging = false, resizing = false, moved = false;
-  let startX = 0, startY = 0, startLeft = 0, startTop = 0, startWidth = 0;
-
-  wrap.addEventListener('pointerdown', function(e){
-    if(e.target.closest('.photo-controls') || e.target.closest('.resize-handle')) return;
-    dragging = true; moved = false;
-    try{ wrap.setPointerCapture(e.pointerId); }catch(err){}
-    startX = e.clientX; startY = e.clientY;
-    startLeft = parseFloat(item.style.left) || 0;
-    startTop = parseFloat(item.style.top) || 0;
-    selectPhoto(item);
-    item.classList.add('dragging');
-    e.preventDefault();
-  });
-  wrap.addEventListener('pointermove', function(e){
-    if(!dragging) return;
-    const dx = e.clientX - startX, dy = e.clientY - startY;
-    if(Math.abs(dx) > 4 || Math.abs(dy) > 4) moved = true;
-    if(!moved) return;
-    const cw = canvasEl.clientWidth || 600;
-    let newLeft = startLeft + dx;
-    let newTop = startTop + dy;
-    const maxLeft = Math.max(0, cw - item.offsetWidth);
-    newLeft = Math.max(0, Math.min(maxLeft, newLeft));
-    newTop = Math.max(0, newTop);
-    item.style.left = newLeft + 'px';
-    item.style.top = newTop + 'px';
-    recalcCanvasHeight(canvasEl);
-  });
-  function endDrag(e){
-    if(!dragging) return;
-    dragging = false;
-    item.classList.remove('dragging');
-    try{ wrap.releasePointerCapture(e.pointerId); }catch(err){}
-    if(moved){
-      const cw = canvasEl.clientWidth || 600;
-      item.dataset.x = (parseFloat(item.style.left) / cw * 100).toFixed(2);
-      item.dataset.y = (parseFloat(item.style.top) / cw * 100).toFixed(2);
-      recalcCanvasHeight(canvasEl);
-      scheduleSave();
-    }
-  }
-  wrap.addEventListener('pointerup', endDrag);
-  wrap.addEventListener('pointercancel', endDrag);
-
-  handle.addEventListener('pointerdown', function(e){
-    e.stopPropagation();
-    resizing = true;
-    try{ handle.setPointerCapture(e.pointerId); }catch(err){}
-    startX = e.clientX;
-    startWidth = item.offsetWidth;
-    item.style.zIndex = ++topZ;
-    item.classList.add('resizing');
-    e.preventDefault();
-  });
-  handle.addEventListener('pointermove', function(e){
-    if(!resizing) return;
-    const dx = e.clientX - startX;
-    const cw = canvasEl.clientWidth || 600;
-    const maxWidth = cw - (parseFloat(item.style.left) || 0);
-    let newWidth = Math.max(MIN_W_PX, Math.min(maxWidth, startWidth + dx));
-    // Never let growing one photo silently overlap (and hide) a neighboring
-    // photo/caption — that's content getting visually "chopped" on screen
-    // and in the printed PDF. Dragging can still stack photos on purpose;
-    // this only stops an ordinary resize from swallowing the item next to it.
-    newWidth = clampWidthToAvoidOverlap(item, canvasEl, newWidth);
-    item.style.width = newWidth + 'px';
-    recalcCanvasHeight(canvasEl);
-  });
-  function endResize(e){
-    if(!resizing) return;
-    resizing = false;
-    item.classList.remove('resizing');
-    try{ handle.releasePointerCapture(e.pointerId); }catch(err){}
-    const cw = canvasEl.clientWidth || 600;
-    item.dataset.w = (item.offsetWidth / cw * 100).toFixed(2);
-    recalcCanvasHeight(canvasEl);
-    scheduleSave();
-  }
-  handle.addEventListener('pointerup', endResize);
-  handle.addEventListener('pointercancel', endResize);
-}
-
-/* Re-scale every photo's pixel position/size when the canvas width changes
-   (window resize, orientation change) so layouts made on desktop still make
-   sense on a phone, and vice versa. */
-let resizeRaf = null;
-function rescaleAllCanvases(){
-  document.querySelectorAll('.photo-canvas').forEach(canvasEl => {
-    canvasEl.querySelectorAll(':scope > .photo-item').forEach(layoutItem);
-    recalcCanvasHeight(canvasEl);
-  });
-}
-window.addEventListener('resize', function(){
-  if(resizeRaf) cancelAnimationFrame(resizeRaf);
-  resizeRaf = requestAnimationFrame(rescaleAllCanvases);
-});
-window.addEventListener('orientationchange', function(){
-  setTimeout(rescaleAllCanvases, 200);
-});
-/* The printed page (Letter width) is narrower than most screens, so photo
-   positions/sizes (stored as % of canvas width, but applied as px) must be
-   recalculated for that narrower canvas right before printing — otherwise a
-   photo placed further right on a wide monitor can land past the print
-   page's edge and get clipped out of the PDF. */
-window.addEventListener('beforeprint', rescaleAllCanvases);
-if(window.matchMedia){
-  const printQuery = window.matchMedia('print');
-  if(printQuery.addEventListener){
-    printQuery.addEventListener('change', function(e){ if(e.matches) rescaleAllCanvases(); });
-  }
-}
-
-/* ---------- drag & drop onto a group (adding new photo files) ---------- */
-// Tracks which drop zones already have listeners attached, in memory only
-// (never written into the saved HTML) so a zone is never wired twice in the
-// same page load, but always gets wired fresh after a reload/restore.
-const wiredDropZones = new Set();
+/* ---------- drag & drop of picture files onto a group ---------- */
+const wiredZones = new WeakSet();
 function wireDropZone(gid){
   const zone = document.getElementById('drop_' + gid);
-  if(!zone || wiredDropZones.has(gid)) return;
-  wiredDropZones.add(gid);
-
-  ['dragenter','dragover'].forEach(evt => {
-    zone.addEventListener(evt, e => {
-      e.preventDefault(); e.stopPropagation();
-      zone.classList.add('drag-over');
-    });
-  });
-  ['dragleave','drop'].forEach(evt => {
-    zone.addEventListener(evt, e => {
-      e.preventDefault(); e.stopPropagation();
-      zone.classList.remove('drag-over');
-    });
-  });
+  if(!zone || wiredZones.has(zone)) return;
+  wiredZones.add(zone);
+  ['dragenter','dragover'].forEach(evt => zone.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); zone.classList.add('drag-over'); }));
+  ['dragleave','drop'].forEach(evt => zone.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); zone.classList.remove('drag-over'); }));
   zone.addEventListener('drop', e => {
     const dt = e.dataTransfer;
-    if(dt && dt.files && dt.files.length){
-      handleFiles(dt.files, gid);
-    }
+    if(dt && dt.files && dt.files.length) handleFiles(dt.files, gid);
   });
-  // Make the whole dashed box clickable to open the file picker, not just the
-  // small button inside it (the button keeps its own handler; this just
-  // covers clicks anywhere else in the box, and ignores clicks that
-  // originated on the button so the picker doesn't open twice).
   zone.addEventListener('click', e => {
     if(e.target.closest('button')) return;
     triggerFileInput(gid);
   });
+}
+
+/* =====================================================================
+   SELECTION + DOCKED TOOLBAR
+   ===================================================================== */
+let selected = null;
+let mode = '';            // '', 'crop', 'adjust', 'markup'
+const ptb = () => document.getElementById('ptb');
+
+function selectItem(item){
+  if(viewMode || !item) return;
+  const ae = document.activeElement;
+  if(ae && ae !== document.body && ae.isContentEditable && !item.contains(ae)){ ae.blur(); }
+  if(selected && selected !== item){ endMode(mode === 'crop' ? false : true); }
+  $$('.photo-item.selected').forEach(it => { if(it !== item) it.classList.remove('selected'); });
+  selected = item;
+  item.classList.add('selected');
+  const g = item.closest('.photo-group'); if(g) lastGid = g.dataset.gid;
+  ptb().hidden = false;
+  document.body.classList.add('ptb-open');
+  syncToolbar();
+}
+function deselect(){
+  if(mode) endMode(mode === 'crop' ? false : true);
+  $$('.photo-item.selected').forEach(it => it.classList.remove('selected'));
+  selected = null;
+  const t = ptb(); if(t) t.hidden = true;
+  document.body.classList.remove('ptb-open');
+}
+function syncToolbar(){
+  if(!selected) return;
+  const p = P(selected);
+  const set = (act, on) => { const b = $('[data-act="' + act + '"]', ptb()); if(b) b.classList.toggle('on', !!on); };
+  set('border', p.border); set('lock', p.lock);
+  set('crop', mode === 'crop'); set('adjust', mode === 'adjust'); set('markup', mode === 'markup');
+}
+
+document.addEventListener('click', function(e){
+  const b = e.target.closest && e.target.closest('#ptb [data-act]');
+  if(b){ doAction(b.dataset.act); return; }
+  if(viewMode){
+    const el = e.target.closest('.photo-item .photo-wrap');
+    if(el){ openLB(el.closest('.photo-item')); }
+  }
+});
+
+function doAction(act){
+  if(!selected) return;
+  const it = selected;
+  switch(act){
+    case 'enlarge': openLB(it); break;
+    case 'crop': mode === 'crop' ? endMode(false) : startCrop(it); break;
+    case 'rotl': rotateItem(it, -90); break;
+    case 'rotr': rotateItem(it, 90); break;
+    case 'fliph': flipItem(it, 'h'); break;
+    case 'flipv': flipItem(it, 'v'); break;
+    case 'adjust': mode === 'adjust' ? endMode(true) : startAdjust(it); break;
+    case 'markup': mode === 'markup' ? endMode(true) : startMarkup(it); break;
+    case 'border': it.dataset.border = P(it).border ? 0 : 1; renderBox(it); syncToolbar(); commit(); break;
+    case 'lock': it.dataset.lock = P(it).lock ? 0 : 1; renderBox(it); syncToolbar(); commit(); break;
+    case 'front': it.dataset.z = nextZ(); layoutItem(it); commit(); break;
+    case 'back': { let m = 1e9; $$('.photo-item').forEach(x => { m = Math.min(m, +x.dataset.z || 0); }); it.dataset.z = m - 1; layoutItem(it); commit(); break; }
+    case 'dup': duplicateSelected(); break;
+    case 'reset': resetItem(it); break;
+    case 'del': deleteSelected(); break;
+  }
+}
+
+/* ---------- geometry edits (rotate / flip) keep markup in place ---------- */
+function mapMarks(item, fn){
+  const p = P(item);
+  const f = pt => fn(pt[0], pt[1]);
+  p.marks.forEach(m => {
+    if(m.pts) m.pts = m.pts.map(f);
+    if(m.a) m.a = f(m.a);
+    if(m.b) m.b = f(m.b);
+  });
+  item.dataset.marks = JSON.stringify(p.marks);
+}
+function rotateItem(item, deg){
+  if(mode === 'crop') endMode(false);
+  const p = P(item);
+  const cw = deg > 0;
+  item.dataset.rot = ((p.rot + deg) % 360 + 360) % 360;
+  mapMarks(item, (x, y) => cw ? [1 - y, x] : [y, 1 - x]);
+  keepWidthAnchor(item);
+  renderBox(item); recalcCanvasHeight(item.parentElement); commit();
+}
+function flipItem(item, which){
+  if(mode === 'crop') endMode(false);
+  if(which === 'h'){ item.dataset.fx = P(item).fx * -1; mapMarks(item, (x, y) => [1 - x, y]); }
+  else { item.dataset.fy = P(item).fy * -1; mapMarks(item, (x, y) => [x, 1 - y]); }
+  renderBox(item); commit();
+}
+function keepWidthAnchor(item){
+  const canvasEl = item.parentElement;
+  const cw = canvasEl.clientWidth || 700;
+  const p = P(item);
+  if(p.x + p.w > 100){ item.dataset.x = r2(Math.max(0, 100 - p.w)); }
+  layoutItem(item);
+  void cw;
+}
+function resetItem(item){
+  if(mode) endMode(false);
+  item.dataset.rot = 0; item.dataset.fx = 1; item.dataset.fy = 1;
+  item.dataset.crop = '0,0,0,0'; item.dataset.adj = '100,100,100,0'; item.dataset.marks = '[]';
+  item.dataset.border = 0;
+  layoutItem(item); recalcCanvasHeight(item.parentElement); syncToolbar(); commit();
+  flashStatus('Photo reset to the original.');
+}
+function deleteSelected(){
+  if(!selected) return;
+  const it = selected, canvasEl = it.parentElement;
+  deselect();
+  it.remove();
+  recalcCanvasHeight(canvasEl);
+  updatePhotoCount();
+  commit();
+}
+function duplicateSelected(){
+  if(!selected) return;
+  const st = itemState(selected);
+  placeCopy(st, selected.parentElement);
+}
+function placeCopy(st, canvasEl){
+  const src = srcStore.get(st.pid);
+  if(!src || !canvasEl) return;
+  const copy = Object.assign({}, st, { pid: newPid(), x: r2(Math.min(+st.x + 3, Math.max(0, 100 - +st.w))), y: r2(+st.y + 3), z: nextZ(), lock: 0 });
+  const it = addPhotoToCanvas(canvasEl.id.replace('canvas_', ''), src, +st.nw, +st.nh, copy);
+  if(it){ updatePhotoCount(); selectItem(it); commit(); }
+}
+function pastePhoto(){
+  if(!photoClip) return;
+  const gid = targetGroupId();
+  const canvasEl = document.getElementById('canvas_' + gid);
+  placeCopy(photoClip, canvasEl);
+}
+
+/* ---------- adjust (brightness / contrast / saturation / black & white) ---------- */
+function startAdjust(item){
+  if(mode) endMode(mode === 'crop' ? false : true);
+  mode = 'adjust';
+  const a = P(item).adj;
+  const sub = document.getElementById('ptbSub');
+  sub.hidden = false;
+  sub.innerHTML =
+    '<span class="ptb-label">Adjust</span>' +
+    '<label>Brightness <input type="range" min="40" max="180" value="' + a[0] + '" data-adj="0"></label>' +
+    '<label>Contrast <input type="range" min="40" max="180" value="' + a[1] + '" data-adj="1"></label>' +
+    '<label>Saturation <input type="range" min="0" max="220" value="' + a[2] + '" data-adj="2"></label>' +
+    '<button type="button" data-sub="bw" class="' + (a[3] > 0 ? 'on' : '') + '">Black &amp; white</button>' +
+    '<button type="button" data-sub="adjreset">Reset adjust</button>' +
+    '<button type="button" data-sub="done" class="apply">Done</button>';
+  syncToolbar();
+}
+function writeAdj(item, idx, val){
+  const a = P(item).adj; a[idx] = val;
+  item.dataset.adj = a.join(',');
+  renderBox(item);
+}
+
+/* ---------- markup ---------- */
+const mk = { tool: 'pen', color: '#CC1B1B', size: 'm' };
+const MK_W = { s: 3.5, m: 6.5, l: 11 };
+const MK_FS = { s: 34, m: 48, l: 72 };
+let markDraft = null;
+function startMarkup(item){
+  if(mode) endMode(mode === 'crop' ? false : true);
+  mode = 'markup';
+  item.classList.add('marking');
+  const box = $('.img-box', item);
+  box.insertAdjacentHTML('beforeend', '<div class="mark-layer"></div>');
+  buildMarkupSub();
+  syncToolbar();
+}
+function buildMarkupSub(){
+  const sub = document.getElementById('ptbSub');
+  sub.hidden = false;
+  const tools = [['pen','Pen'],['arrow','Arrow'],['rect','Box'],['ell','Oval'],['text','Text']];
+  const cols = ['#CC1B1B','#FFD400','#FFFFFF','#111111','#1E6BFF'];
+  const sizes = [['s','Thin'],['m','Medium'],['l','Thick']];
+  sub.innerHTML =
+    '<span class="ptb-label">Markup</span>' +
+    tools.map(t => '<button type="button" data-mk="' + t[0] + '" class="' + (mk.tool === t[0] ? 'on' : '') + '">' + t[1] + '</button>').join('') +
+    cols.map(c => '<button type="button" class="sw ' + (mk.color === c ? 'on' : '') + '" data-mkc="' + c + '" style="background:' + c + '" title="Color"></button>').join('') +
+    sizes.map(s => '<button type="button" data-mks="' + s[0] + '" class="' + (mk.size === s[0] ? 'on' : '') + '">' + s[1] + '</button>').join('') +
+    '<button type="button" data-sub="undomark">Undo last</button>' +
+    '<button type="button" data-sub="clearmarks" class="danger">Clear markup</button>' +
+    '<button type="button" data-sub="done" class="apply">Done</button>';
+}
+function markPoint(e, box){
+  const r = box.getBoundingClientRect();
+  return [clamp((e.clientX - r.left) / r.width, 0, 1), clamp((e.clientY - r.top) / r.height, 0, 1)];
+}
+function markDown(e){
+  const item = selected; if(!item) return;
+  const box = $('.img-box', item);
+  const pt = markPoint(e, box);
+  const col = mk.color, w = MK_W[mk.size];
+  if(mk.tool === 'text'){
+    const v = window.prompt('Text to place on the photo:', '');
+    if(v && v.trim()){
+      const arr = P(item).marks; arr.push({ t: 'text', c: col, s: MK_FS[mk.size], a: pt, v: v.trim() });
+      item.dataset.marks = JSON.stringify(arr); renderBox(item); commit();
+    }
+    return;
+  }
+  markDraft = (mk.tool === 'pen') ? { t: 'pen', c: col, w, pts: [pt] } : { t: mk.tool, c: col, w, a: pt, b: pt };
+  markDraft._box = box; markDraft._id = e.pointerId;
+  try{ e.target.setPointerCapture(e.pointerId); }catch(err){}
+  e.preventDefault();
+}
+function markMove(e){
+  if(!markDraft || !selected) return;
+  const pt = markPoint(e, markDraft._box);
+  if(markDraft.t === 'pen') markDraft.pts.push(pt); else markDraft.b = pt;
+  renderBox(selected, { draft: stripDraft(markDraft) });
+}
+function stripDraft(d){ const c = Object.assign({}, d); delete c._box; delete c._id; return c; }
+function markUp(){
+  if(!markDraft || !selected) return;
+  const d = stripDraft(markDraft); markDraft = null;
+  const tiny = d.t === 'pen' ? d.pts.length < 2 : (Math.abs(d.a[0] - d.b[0]) + Math.abs(d.a[1] - d.b[1]) < 0.01);
+  if(!tiny){
+    const arr = P(selected).marks; arr.push(d);
+    selected.dataset.marks = JSON.stringify(arr);
+    commit();
+  }
+  renderBox(selected);
+}
+
+/* ---------- crop ---------- */
+let cropState = null;
+function startCrop(item){
+  if(mode) endMode(mode === 'crop' ? false : true);
+  mode = 'crop';
+  const p = P(item);
+  item.classList.add('cropping');
+  cropState = { item, rect: cropToDisplayRect(p), ratio: 0, drag: null, before: { crop: item.dataset.crop || '0,0,0,0', marks: item.dataset.marks || '[]' } };
+  renderBox(item, { cropOverride: [0,0,0,0], noMarks: true });
+  const box = $('.img-box', item);
+  box.insertAdjacentHTML('beforeend',
+    '<div class="crop-layer"><div class="crop-rect">' +
+    ['nw','n','ne','e','se','s','sw','w'].map(h => '<i class="ch ' + h + '" data-h="' + h + '"></i>').join('') +
+    '</div></div>');
+  drawCropRect();
+  const sub = document.getElementById('ptbSub');
+  sub.hidden = false;
+  sub.innerHTML =
+    '<span class="ptb-label">Crop</span>' +
+    '<button type="button" data-ratio="0" class="on">Free</button>' +
+    '<button type="button" data-ratio="1">1:1</button>' +
+    '<button type="button" data-ratio="1.3333">4:3</button>' +
+    '<button type="button" data-ratio="1.5">3:2</button>' +
+    '<button type="button" data-ratio="1.7778">16:9</button>' +
+    '<button type="button" data-ratio="0.75">3:4</button>' +
+    '<button type="button" data-sub="cropreset">Reset crop</button>' +
+    '<button type="button" data-sub="cropcancel">Cancel</button>' +
+    '<button type="button" data-sub="cropapply" class="apply">Apply crop</button>';
+  syncToolbar();
+}
+function drawCropRect(){
+  if(!cropState) return;
+  const r = cropState.rect, el = $('.crop-rect', cropState.item);
+  if(!el) return;
+  el.style.left = (r.u0 * 100) + '%'; el.style.top = (r.v0 * 100) + '%';
+  el.style.width = ((r.u1 - r.u0) * 100) + '%'; el.style.height = ((r.v1 - r.v0) * 100) + '%';
+  const layer = $('.crop-layer', cropState.item);
+  if(layer) layer.dataset.ratio = cropState.ratio ? '1' : '0';
+}
+function setCropRatio(R){
+  if(!cropState) return;
+  cropState.ratio = R;
+  $$('#ptbSub [data-ratio]').forEach(b => b.classList.toggle('on', +b.dataset.ratio === R));
+  if(!R){ drawCropRect(); return; }
+  const br = $('.img-box', cropState.item).getBoundingClientRect();
+  const Wpx = br.width, Hpx = br.height;
+  const cur = cropState.rect;
+  const cx = (cur.u0 + cur.u1) / 2, cy = (cur.v0 + cur.v1) / 2;
+  let wpx, hpx;
+  if(Wpx / Hpx > R){ hpx = Hpx; wpx = R * Hpx; } else { wpx = Wpx; hpx = Wpx / R; }
+  let wn = wpx / Wpx, hn = hpx / Hpx;
+  wn *= 0.92; hn *= 0.92;
+  let u0 = clamp(cx - wn / 2, 0, 1 - wn), v0 = clamp(cy - hn / 2, 0, 1 - hn);
+  cropState.rect = { u0, v0, u1: u0 + wn, v1: v0 + hn };
+  drawCropRect();
+}
+function cropDown(e){
+  if(!cropState) return;
+  const h = e.target.closest('.ch');
+  const inRect = e.target.closest('.crop-rect');
+  if(!h && !inRect) return;
+  const br = $('.img-box', cropState.item).getBoundingClientRect();
+  cropState.drag = { h: h ? h.dataset.h : 'move', sx: e.clientX, sy: e.clientY, rect: Object.assign({}, cropState.rect), br };
+  try{ e.target.setPointerCapture(e.pointerId); }catch(err){}
+  e.preventDefault(); e.stopPropagation();
+}
+function cropMove(e){
+  const d = cropState && cropState.drag; if(!d) return;
+  const dx = (e.clientX - d.sx) / d.br.width, dy = (e.clientY - d.sy) / d.br.height;
+  const r0 = d.rect, MIN = 0.04;
+  let { u0, v0, u1, v1 } = r0;
+  if(d.h === 'move'){
+    const w = u1 - u0, h = v1 - v0;
+    u0 = clamp(r0.u0 + dx, 0, 1 - w); v0 = clamp(r0.v0 + dy, 0, 1 - h); u1 = u0 + w; v1 = v0 + h;
+  } else if(d.h.length === 2 && cropState.ratio){
+    const sx = d.h.includes('e') ? 1 : -1, sy = d.h.includes('s') ? 1 : -1;
+    const ax = sx > 0 ? r0.u0 : r0.u1, ay = sy > 0 ? r0.v0 : r0.v1;
+    const px = (sx > 0 ? r0.u1 : r0.u0) + dx, py = (sy > 0 ? r0.v1 : r0.v0) + dy;
+    let w = (px - ax) * sx, h = (py - ay) * sy;
+    const k = cropState.ratio * d.br.height / d.br.width;      // w = k * h (normalized)
+    w = Math.max(w, MIN); h = Math.max(h, MIN);
+    if(w > k * h) w = k * h; else h = w / k;
+    const maxW = sx > 0 ? 1 - ax : ax, maxH = sy > 0 ? 1 - ay : ay;
+    const f = Math.min(1, maxW / w, maxH / h);
+    w *= f; h *= f;
+    if(w < MIN){ w = MIN; h = w / k; }
+    u0 = sx > 0 ? ax : ax - w; u1 = sx > 0 ? ax + w : ax; v0 = sy > 0 ? ay : ay - h; v1 = sy > 0 ? ay + h : ay;
+  } else {
+    if(d.h.includes('w')) u0 = clamp(r0.u0 + dx, 0, r0.u1 - MIN);
+    if(d.h.includes('e')) u1 = clamp(r0.u1 + dx, r0.u0 + MIN, 1);
+    if(d.h.includes('n')) v0 = clamp(r0.v0 + dy, 0, r0.v1 - MIN);
+    if(d.h.includes('s')) v1 = clamp(r0.v1 + dy, r0.v0 + MIN, 1);
+  }
+  cropState.rect = { u0, v0, u1, v1 };
+  drawCropRect();
+}
+function cropUp(){ if(cropState) cropState.drag = null; }
+function applyCrop(){
+  if(!cropState) return;
+  const item = cropState.item, p = P(item);
+  const oldRect = cropToDisplayRect(p);
+  const newCrop = displayRectToCrop(p, cropState.rect);
+  const newRect = cropState.rect;
+  // keep markup on the same spot of the picture
+  const ow = oldRect.u1 - oldRect.u0, oh = oldRect.v1 - oldRect.v0, nw = newRect.u1 - newRect.u0, nh = newRect.v1 - newRect.v0;
+  mapMarks(item, (x, y) => [((oldRect.u0 + x * ow) - newRect.u0) / nw, ((oldRect.v0 + y * oh) - newRect.v0) / nh]);
+  item.dataset.crop = newCrop.join(',');
+  finishCrop();
+  commit();
+}
+function finishCrop(){
+  if(!cropState) return;
+  const item = cropState.item;
+  item.classList.remove('cropping');
+  const l = $('.crop-layer', item); if(l) l.remove();
+  cropState = null;
+  mode = '';
+  const sub = document.getElementById('ptbSub'); sub.hidden = true; sub.innerHTML = '';
+  layoutItem(item); recalcCanvasHeight(item.parentElement);
+  syncToolbar();
+}
+function cancelCrop(){
+  if(!cropState) return;
+  finishCrop();
+}
+
+function endMode(commitIt){
+  if(!mode) return;
+  const m = mode;
+  if(m === 'crop'){ cancelCrop(); return; }
+  if(m === 'markup' && selected){
+    selected.classList.remove('marking');
+    const l = $('.mark-layer', selected); if(l) l.remove();
+    markDraft = null;
+  }
+  mode = '';
+  const sub = document.getElementById('ptbSub'); if(sub){ sub.hidden = true; sub.innerHTML = ''; }
+  if(commitIt && selected) renderBox(selected);
+  syncToolbar();
+}
+
+/* sub-panel clicks */
+document.addEventListener('click', function(e){
+  const b = e.target.closest && e.target.closest('#ptbSub button');
+  if(!b || !selected) return;
+  if(b.dataset.ratio !== undefined){ setCropRatio(parseFloat(b.dataset.ratio)); return; }
+  if(b.dataset.mk){ mk.tool = b.dataset.mk; buildMarkupSub(); return; }
+  if(b.dataset.mkc){ mk.color = b.dataset.mkc; buildMarkupSub(); return; }
+  if(b.dataset.mks){ mk.size = b.dataset.mks; buildMarkupSub(); return; }
+  switch(b.dataset.sub){
+    case 'cropapply': applyCrop(); break;
+    case 'cropcancel': cancelCrop(); break;
+    case 'cropreset': if(cropState){ cropState.rect = { u0: 0, v0: 0, u1: 1, v1: 1 }; drawCropRect(); } break;
+    case 'bw': { const a = P(selected).adj; writeAdj(selected, 3, a[3] > 0 ? 0 : 100); b.classList.toggle('on'); commit(); break; }
+    case 'adjreset': selected.dataset.adj = '100,100,100,0'; renderBox(selected); startAdjust(selected); commit(); break;
+    case 'undomark': { const arr = P(selected).marks; arr.pop(); selected.dataset.marks = JSON.stringify(arr); renderBox(selected); commit(); break; }
+    case 'clearmarks': selected.dataset.marks = '[]'; renderBox(selected); commit(); break;
+    case 'done': endMode(true); break;
+  }
+});
+document.addEventListener('input', function(e){
+  const r = e.target.closest && e.target.closest('#ptbSub input[data-adj]');
+  if(r && selected){ writeAdj(selected, +r.dataset.adj, +r.value); }
+});
+document.addEventListener('change', function(e){
+  const r = e.target.closest && e.target.closest('#ptbSub input[data-adj]');
+  if(r && selected){ commit(); }
+});
+
+/* =====================================================================
+   POINTER INTERACTIONS: move, resize, snap
+   ===================================================================== */
+let drag = null, lastClick = { item: null, t: 0 };
+document.addEventListener('pointerdown', function(e){
+  if(e.pointerType === 'mouse' && e.button !== 0) return;
+  const t = e.target;
+  if(t.closest && t.closest('.crop-layer')){ cropDown(e); return; }
+  if(t.closest && t.closest('.mark-layer')){ markDown(e); return; }
+  if(!t.closest) return;
+  const item = t.closest('.photo-item');
+  if(!item){
+    if(!viewMode && selected && !t.closest('#ptb, #lb, #kb')) deselect();
+    return;
+  }
+  if(viewMode) return;
+  const wrap = t.closest('.photo-wrap');
+  if(!wrap){ selectItem(item); return; }      // clicked the caption
+  if(mode === 'crop' || mode === 'markup'){ if(selected !== item) selectItem(item); return; }
+  if(selected !== item) selectItem(item);
+  const p = P(item);
+  const rh = t.closest('.rh');
+  const canvasEl = item.parentElement;
+  const cw = canvasEl.clientWidth || 700;
+  if(rh && !p.lock){
+    drag = { kind: 'resize', c: rh.dataset.c, item, canvasEl, cw, sx: e.clientX, sy: e.clientY,
+      left: parseFloat(item.style.left) || 0, top: parseFloat(item.style.top) || 0, width: item.offsetWidth,
+      wrapH: wrap.offsetHeight, A: dispAspect(p), id: e.pointerId, moved: false, el: rh };
+    item.classList.add('resizing');
+  } else {
+    drag = { kind: 'move', item, canvasEl, cw, sx: e.clientX, sy: e.clientY,
+      left: parseFloat(item.style.left) || 0, top: parseFloat(item.style.top) || 0,
+      id: e.pointerId, moved: false, el: wrap, type: e.pointerType };
+  }
+  try{ drag.el.setPointerCapture(e.pointerId); }catch(err){}
+  e.preventDefault();
+});
+document.addEventListener('pointermove', function(e){
+  if(markDraft){ markMove(e); return; }
+  if(cropState && cropState.drag){ cropMove(e); return; }
+  if(!drag || e.pointerId !== drag.id) return;
+  const dx = e.clientX - drag.sx, dy = e.clientY - drag.sy;
+  if(!drag.moved && Math.abs(dx) < 4 && Math.abs(dy) < 4) return;
+  drag.moved = true;
+  const item = drag.item, cw = drag.cw;
+  if(drag.kind === 'move'){
+    if(P(item).lock) return;
+    item.classList.add('dragging');
+    let left = drag.left + dx, top = drag.top + dy;
+    left = clamp(left, 0, Math.max(0, cw - item.offsetWidth));
+    top = Math.max(0, top);
+    const s = snapMove(drag, left, top, e.altKey);
+    item.style.left = s.left + 'px'; item.style.top = s.top + 'px';
+  } else {
+    const c = drag.c, sx = c.includes('e') ? 1 : -1, sy = c.includes('s') ? 1 : -1;
+    const d = Math.abs(dx) >= Math.abs(dy * drag.A) ? dx * sx : dy * sy * drag.A;
+    let newW = clamp(drag.width + d, MIN_W_PX, cw);
+    if(sx > 0) newW = Math.min(newW, cw - drag.left); else newW = Math.min(newW, drag.left + drag.width);
+    const ratioH = drag.wrapH / drag.width;
+    const newWrapH = newW * ratioH;
+    item.style.width = newW + 'px';
+    item.style.left = (sx > 0 ? drag.left : drag.left + drag.width - newW) + 'px';
+    if(sy < 0) item.style.top = Math.max(0, drag.top + drag.wrapH - newWrapH) + 'px';
+  }
+  recalcCanvasHeight(drag.canvasEl);
+});
+function endPointer(e){
+  if(markDraft){ markUp(); return; }
+  if(cropState && cropState.drag){ cropUp(); return; }
+  if(!drag || e.pointerId !== drag.id) return;
+  const d = drag; drag = null;
+  const item = d.item, cw = d.cw;
+  try{ d.el.releasePointerCapture(d.id); }catch(err){}
+  item.classList.remove('dragging', 'resizing');
+  clearGuides(d.canvasEl);
+  if(!d.moved){
+    // a click: second click on the same photo within 400ms enlarges it
+    const now = Date.now();
+    if(lastClick.item === item && now - lastClick.t < 400){ lastClick = { item: null, t: 0 }; openLB(item); }
+    else lastClick = { item, t: now };
+    return;
+  }
+  if(d.kind === 'move' && P(item).lock) return;
+  item.dataset.x = r2((parseFloat(item.style.left) || 0) / cw * 100);
+  item.dataset.y = r2((parseFloat(item.style.top) || 0) / cw * 100);
+  if(d.kind === 'resize') item.dataset.w = r2(item.offsetWidth / cw * 100);
+  layoutItem(item);
+  recalcCanvasHeight(d.canvasEl);
+  commit();
+}
+document.addEventListener('pointerup', endPointer);
+document.addEventListener('pointercancel', endPointer);
+
+function clearGuides(canvasEl){ $$('.snap-guide', canvasEl).forEach(g => g.remove()); }
+function snapMove(d, left, top, noSnap){
+  const canvasEl = d.canvasEl, item = d.item;
+  clearGuides(canvasEl);
+  if(noSnap) return { left, top };
+  const T = 6, w = item.offsetWidth, h = item.offsetHeight, cw = d.cw;
+  const xs = [0, cw / 2, cw], ys = [0];
+  $$(':scope > .photo-item', canvasEl).forEach(o => {
+    if(o === item) return;
+    const ol = parseFloat(o.style.left) || 0, ot = parseFloat(o.style.top) || 0, ow = o.offsetWidth, oh = o.offsetHeight;
+    xs.push(ol, ol + ow, ol + ow / 2); ys.push(ot, ot + oh, ot + oh / 2);
+  });
+  let bx = null, by = null, gx = null, gy = null;
+  [[left, 0], [left + w / 2, w / 2], [left + w, w]].forEach(([edge, off]) => {
+    xs.forEach(x => { const dd = x - edge; if(Math.abs(dd) <= T && (bx === null || Math.abs(dd) < Math.abs(bx))){ bx = dd; gx = x; } });
+  });
+  [[top, 0], [top + h / 2, h / 2], [top + h, h]].forEach(([edge]) => {
+    ys.forEach(y => { const dd = y - edge; if(Math.abs(dd) <= T && (by === null || Math.abs(dd) < Math.abs(by))){ by = dd; gy = y; } });
+  });
+  if(bx !== null){ left += bx; canvasEl.insertAdjacentHTML('beforeend', '<div class="snap-guide v" style="left:' + gx + 'px"></div>'); }
+  if(by !== null){ top += by; canvasEl.insertAdjacentHTML('beforeend', '<div class="snap-guide h" style="top:' + gy + 'px"></div>'); }
+  return { left: clamp(left, 0, Math.max(0, cw - w)), top: Math.max(0, top) };
+}
+
+/* =====================================================================
+   UNDO / REDO  (photo changes)
+   ===================================================================== */
+let hist = [], hidx = -1, commitTimer = null;
+function captureState(){
+  return JSON.stringify($$('.photo-group').map(g => ({
+    gid: g.dataset.gid,
+    title: $('.group-title', g).innerHTML,
+    desc: $('.group-desc', g).innerHTML,
+    items: $$(':scope > .photo-canvas > .photo-item', g).map(itemState)
+  })));
+}
+function commit(){
+  if(viewMode) return;
+  const s = captureState();
+  if(hidx >= 0 && hist[hidx] === s){ scheduleSave(); return; }
+  hist = hist.slice(0, hidx + 1);
+  hist.push(s);
+  if(hist.length > 80) hist.shift();
+  hidx = hist.length - 1;
+  scheduleSave();
+}
+function undo(){ if(hidx > 0){ hidx--; restoreState(JSON.parse(hist[hidx])); flashStatus('Undo'); } else flashStatus('Nothing to undo.'); }
+function redo(){ if(hidx < hist.length - 1){ hidx++; restoreState(JSON.parse(hist[hidx])); flashStatus('Redo'); } else flashStatus('Nothing to redo.'); }
+function restoreState(state){
+  const keepSel = selected ? selected.dataset.pid : null;
+  deselect();
+  const container = document.getElementById('photoGroups');
+  const existing = new Map($$('.photo-group').map(g => [g.dataset.gid, g]));
+  const keep = new Set();
+  state.forEach(gs => {
+    let g = existing.get(gs.gid);
+    if(!g){ g = createGroupEl(gs.gid, gs.title, gs.desc); }
+    keep.add(gs.gid);
+    container.appendChild(g);
+    wireDropZone(gs.gid);
+    const canvasEl = $('.photo-canvas', g);
+    const have = new Map($$(':scope > .photo-item', canvasEl).map(it => [it.dataset.pid, it]));
+    const keepP = new Set();
+    gs.items.forEach(is => {
+      let it = have.get(is.pid);
+      if(!it){ it = createItemEl(canvasEl, is.pid, srcStore.get(is.pid) || '', is.cap); }
+      applyDataset(it, is);
+      keepP.add(is.pid);
+    });
+    have.forEach((it, pid) => { if(!keepP.has(pid)) it.remove(); });
+  });
+  existing.forEach((g, gid) => { if(!keep.has(gid)) g.remove(); });
+  rescaleAllCanvases();
+  updatePhotoCount();
+  if(keepSel){ const it = $('.photo-item[data-pid="' + keepSel + '"]'); if(it) selectItem(it); }
+  scheduleSave();
+}
+
+/* =====================================================================
+   ENLARGED VIEW (lightbox)
+   ===================================================================== */
+let lbList = [], lbIdx = -1, lbZoom = 1;
+function lbOpen(){ return document.getElementById('lb').classList.contains('open'); }
+function openLB(el){
+  if(!el) return;
+  if(mode === 'crop') endMode(false);
+  lbList = $$('.photo-item');
+  lbIdx = lbList.indexOf(el);
+  if(lbIdx < 0) return;
+  lbZoom = 1;
+  const lb = document.getElementById('lb');
+  lb.classList.remove('zoomed');
+  lb.classList.toggle('single', lbList.length < 2);
+  lb.classList.add('open');
+  lb.setAttribute('aria-hidden', 'false');
+  renderLB();
+}
+function closeLB(){
+  const lb = document.getElementById('lb');
+  lb.classList.remove('open', 'zoomed');
+  lb.setAttribute('aria-hidden', 'true');
+  document.getElementById('lbStage').innerHTML = '';
+}
+function renderLB(){
+  const el = lbList[lbIdx], stage = document.getElementById('lbStage');
+  stage.innerHTML = '';
+  let A = 1, cap = '';
+  const p = P(el);
+  A = dispAspect(p);
+  const clone = $('.img-box', el).cloneNode(true);
+  $$('.crop-layer, .mark-layer', clone).forEach(n => n.remove());
+  stage.appendChild(clone);
+  cap = ($('.photo-caption', el).textContent || '').trim();
+  stage.dataset.aspect = A;
+  sizeLB();
+  document.getElementById('lbCap').textContent = cap;
+  document.getElementById('lbCount').textContent = (lbIdx + 1) + ' / ' + lbList.length;
+}
+function sizeLB(){
+  const stage = document.getElementById('lbStage');
+  const A = +stage.dataset.aspect || 1;
+  const maxW = window.innerWidth - 32, maxH = window.innerHeight - 120;
+  const w = Math.min(maxW, maxH * A) * lbZoom;
+  stage.style.width = w + 'px';
+  stage.style.height = (w / A) + 'px';
+}
+function lbStep(d){
+  if(lbList.length < 2) return;
+  lbIdx = (lbIdx + d + lbList.length) % lbList.length;
+  lbZoom = 1; document.getElementById('lb').classList.remove('zoomed');
+  renderLB();
+}
+function lbToggleZoom(ev){
+  const lb = document.getElementById('lb'), view = document.getElementById('lbView'), stage = document.getElementById('lbStage');
+  const rect = stage.getBoundingClientRect();
+  const fx = ev ? (ev.clientX - rect.left) / rect.width : .5, fy = ev ? (ev.clientY - rect.top) / rect.height : .5;
+  lbZoom = lbZoom > 1 ? 1 : 2.6;
+  lb.classList.toggle('zoomed', lbZoom > 1);
+  sizeLB();
+  if(lbZoom > 1){
+    const r2_ = stage.getBoundingClientRect();
+    view.scrollLeft = fx * r2_.width - view.clientWidth / 2;
+    view.scrollTop = fy * r2_.height - view.clientHeight / 2;
+  }
+}
+(function wireLB(){
+  const lb = document.getElementById('lb');
+  $('.lb-close', lb).addEventListener('click', closeLB);
+  $('.lb-prev', lb).addEventListener('click', () => lbStep(-1));
+  $('.lb-next', lb).addEventListener('click', () => lbStep(1));
+  document.getElementById('lbStage').addEventListener('click', e => { e.stopPropagation(); lbToggleZoom(e); });
+  lb.addEventListener('click', e => { if(e.target === lb || e.target.id === 'lbView' || e.target.id === 'lbCap') closeLB(); });
+  let tx = null;
+  lb.addEventListener('touchstart', e => { tx = e.touches.length === 1 ? e.touches[0].clientX : null; }, { passive: true });
+  lb.addEventListener('touchend', e => {
+    if(tx === null || lbZoom > 1) return;
+    const dx = e.changedTouches[0].clientX - tx; tx = null;
+    if(Math.abs(dx) > 60) lbStep(dx < 0 ? 1 : -1);
+  }, { passive: true });
+})();
+
+/* =====================================================================
+   KEYBOARD SHORTCUTS
+   ===================================================================== */
+function toggleKB(force){
+  const kb = document.getElementById('kb');
+  const open = force === undefined ? !kb.classList.contains('open') : force;
+  kb.classList.toggle('open', open);
+  kb.setAttribute('aria-hidden', open ? 'false' : 'true');
+}
+document.getElementById('kbClose').addEventListener('click', () => toggleKB(false));
+document.getElementById('kb').addEventListener('click', e => { if(e.target.id === 'kb') toggleKB(false); });
+
+let nudgeTimer = null;
+function nudge(item, dx, dy){
+  if(P(item).lock) return;
+  const canvasEl = item.parentElement, cw = canvasEl.clientWidth || 700;
+  const p = P(item);
+  item.dataset.x = r2(clamp(p.x + dx / cw * 100, 0, Math.max(0, 100 - p.w)));
+  item.dataset.y = r2(Math.max(0, p.y + dy / cw * 100));
+  layoutItem(item); recalcCanvasHeight(canvasEl);
+  clearTimeout(nudgeTimer); nudgeTimer = setTimeout(commit, 450);
+}
+function growItem(item, dPct){
+  if(P(item).lock) return;
+  const p = P(item);
+  const nw = clamp(p.w + dPct, 6, 100);
+  item.dataset.w = r2(nw);
+  if(p.x + nw > 100) item.dataset.x = r2(Math.max(0, 100 - nw));
+  layoutItem(item); recalcCanvasHeight(item.parentElement);
+  clearTimeout(nudgeTimer); nudgeTimer = setTimeout(commit, 450);
+}
+
+document.addEventListener('keydown', function(e){
+  const key = e.key, lower = key.length === 1 ? key.toLowerCase() : key;
+  const mod = e.ctrlKey || e.metaKey;
+
+  if(document.getElementById('kb').classList.contains('open')){
+    if(key === 'Escape' || key === '?' || key === 'F1'){ e.preventDefault(); toggleKB(false); }
+    return;
+  }
+  if(lbOpen()){
+    if(key === 'Escape'){ e.preventDefault(); closeLB(); }
+    else if(key === 'ArrowRight'){ e.preventDefault(); lbStep(1); }
+    else if(key === 'ArrowLeft'){ e.preventDefault(); lbStep(-1); }
+    else if(key === '+' || key === '=' || key === '-'){ e.preventDefault(); lbToggleZoom(null); }
+    return;
+  }
+
+  if(mod && lower === 's'){ e.preventDefault(); downloadHTML(); return; }
+  if(mod && lower === 'p'){ e.preventDefault(); savePDF(); return; }
+  if(mod && lower === 'e'){ e.preventDefault(); toggleMode(); return; }
+  const typing = isTyping(e.target);
+  if(!typing && (key === '?' || key === 'F1')){ e.preventDefault(); toggleKB(true); return; }
+  if(key === 'F1'){ e.preventDefault(); toggleKB(true); return; }
+  if(viewMode){
+    return;
+  }
+  if(typing) return;                         // text boxes keep their own Ctrl+Z / B / I / U / C / V
+
+  if(mode === 'crop'){
+    if(key === 'Enter'){ e.preventDefault(); applyCrop(); }
+    else if(key === 'Escape'){ e.preventDefault(); cancelCrop(); }
+    return;
+  }
+  if(mode === 'markup' && key === 'Escape'){ e.preventDefault(); endMode(true); return; }
+
+  if(mod && lower === 'z'){ e.preventDefault(); e.shiftKey ? redo() : undo(); return; }
+  if(mod && lower === 'y'){ e.preventDefault(); redo(); return; }
+  if(mod && lower === 'a'){ return; }
+  if(!selected){
+    if(mod && lower === 'v'){ return; }      // paste handled by the paste event
+    return;
+  }
+  if(mod && lower === 'c'){ photoClip = itemState(selected); return; }   // copy event adds the clipboard marker
+  if(mod && lower === 'x'){ return; }
+  if(mod && lower === 'd'){ e.preventDefault(); duplicateSelected(); return; }
+  if(mod && key === ']'){ e.preventDefault(); doAction('front'); return; }
+  if(mod && key === '['){ e.preventDefault(); doAction('back'); return; }
+  if(mod && key === '0'){ e.preventDefault(); resetItem(selected); return; }
+  if(mod) return;
+
+  const step = e.shiftKey ? 20 : 2;
+  switch(key){
+    case 'Escape': e.preventDefault(); deselect(); return;
+    case 'Delete': case 'Backspace': e.preventDefault(); deleteSelected(); return;
+    case 'ArrowLeft': e.preventDefault(); nudge(selected, -step, 0); return;
+    case 'ArrowRight': e.preventDefault(); nudge(selected, step, 0); return;
+    case 'ArrowUp': e.preventDefault(); nudge(selected, 0, -step); return;
+    case 'ArrowDown': e.preventDefault(); nudge(selected, 0, step); return;
+    case 'Enter': e.preventDefault(); openLB(selected); return;
+    case '+': case '=': e.preventDefault(); growItem(selected, e.shiftKey ? 8 : 3); return;
+    case '-': case '_': e.preventDefault(); growItem(selected, e.shiftKey ? -8 : -3); return;
+  }
+  switch(lower){
+    case 'e': openLB(selected); break;
+    case 'c': startCrop(selected); break;
+    case 'r': rotateItem(selected, e.shiftKey ? -90 : 90); break;
+    case 'h': flipItem(selected, 'h'); break;
+    case 'v': flipItem(selected, 'v'); break;
+    case 'a': mode === 'adjust' ? endMode(true) : startAdjust(selected); break;
+    case 'm': mode === 'markup' ? endMode(true) : startMarkup(selected); break;
+    case 'b': doAction('border'); break;
+    case 'l': doAction('lock'); break;
+    default: return;
+  }
+  e.preventDefault();
+});
+
+/* =====================================================================
+   PRINT: a flow layout is built right before printing so nothing is cut
+   off, overlapped or squished, and photos never split across pages.
+   ===================================================================== */
+const PRINT_MAX_IMG_H = 820;       // px: tallest a photo may be so it always fits one page
+function removePrintFlow(){
+  $$('.pf').forEach(n => n.remove());
+  $$('.photo-group.has-pf').forEach(g => g.classList.remove('has-pf'));
+}
+function buildPrintFlow(){
+  removePrintFlow();
+  $$('.photo-canvas').forEach(canvasEl => {
+    const items = $$(':scope > .photo-item', canvasEl);
+    if(!items.length) return;
+    const info = items.map(it => {
+      const p = P(it);
+      return { it, p, x: p.x, w: p.w, top: parseFloat(it.style.top) || 0, h: it.offsetHeight };
+    }).sort((a, b) => (a.top - b.top) || (a.x - b.x));
+    // Lay photos out in rows, top to bottom. Photos that sit side by side on screen stay
+    // side by side; a photo that would not fit on the row wraps to the next row at full
+    // size (never shrunk), so nothing is squeezed, overlapped or cut off.
+    const rows = [];
+    let cur = null;
+    info.forEach(o => {
+      const w = Math.min(100, o.w);
+      let gap = 0;
+      if(cur){
+        gap = Math.max(0, o.x - cur.cursor);
+        const sameBand = o.top < cur.bottom - Math.min(o.h, cur.minH) * 0.35;
+        if(!sameBand || cur.total + gap + w > 100.5){
+          if(sameBand && cur.total + w <= 100.5){ gap = Math.max(0, Math.min(gap, 100 - cur.total - w)); }
+          else cur = null;
+        }
+      }
+      if(!cur){
+        cur = { parts: [], total: 0, cursor: 0, bottom: 0, minH: 1e9 };
+        rows.push(cur);
+        gap = Math.max(0, Math.min(o.x, 100 - w));
+      }
+      cur.parts.push({ o, gap, w });
+      cur.total += gap + w;
+      cur.cursor = o.x + w;
+      cur.bottom = Math.max(cur.bottom, o.top + o.h);
+      cur.minH = Math.min(cur.minH, o.h);
+    });
+    let html = '<div class="pf">';
+    rows.forEach(row => {
+      html += '<div class="pf-row">';
+      row.parts.forEach(({ o, gap, w }) => {
+        const A = dispAspect(o.p);
+        const box = $('.img-box', o.it).cloneNode(true);
+        $$('.crop-layer, .mark-layer', box).forEach(n => n.remove());
+        const cap = ($('.photo-caption', o.it).innerHTML || '').trim();
+        const capText = ($('.photo-caption', o.it).textContent || '').trim();
+        html += '<div class="pf-item' + (o.p.border ? ' has-border' : '') + '" style="margin-left:' + gap.toFixed(3) + '%;width:min(' + w.toFixed(3) + '%,' + (PRINT_MAX_IMG_H * A).toFixed(1) + 'px)">' +
+          box.outerHTML +
+          (capText ? '<div class="photo-caption">' + cap + '</div>' : '') +
+          '</div>';
+      });
+      html += '</div>';
+    });
+    html += '</div>';
+    canvasEl.insertAdjacentHTML('afterend', html);
+    canvasEl.closest('.photo-group').classList.add('has-pf');
+  });
+}
+window.addEventListener('beforeprint', function(){ if(mode) endMode(mode === 'crop' ? false : true); deselect(); buildPrintFlow(); });
+window.addEventListener('afterprint', function(){ removePrintFlow(); rescaleAllCanvases(); });
+function savePDF(){
+  if(mode) endMode(mode === 'crop' ? false : true);
+  deselect();
+  buildPrintFlow();
+  window.print();
+}
+
+/* =====================================================================
+   SAVE AN HTML COPY (Ctrl+S) - opens in view mode, every photo enlarges
+   ===================================================================== */
+function snapshotHTML(){
+  if(mode) endMode(mode === 'crop' ? false : true);
+  deselect(); closeLB(); toggleKB(false); removePrintFlow();
+  const clone = document.documentElement.cloneNode(true);
+  clone.setAttribute('data-saved', '1');
+  clone.querySelectorAll('.selected, .cropping, .marking, .dragging, .resizing').forEach(n => n.classList.remove('selected', 'cropping', 'marking', 'dragging', 'resizing'));
+  clone.querySelectorAll('.crop-layer, .mark-layer, .snap-guide, .pf').forEach(n => n.remove());
+  const b = clone.querySelector('body');
+  b.classList.remove('view-mode', 'ptb-open');
+  const t = clone.querySelector('#ptb'); if(t){ t.setAttribute('hidden', ''); }
+  const sub = clone.querySelector('#ptbSub'); if(sub){ sub.setAttribute('hidden', ''); sub.innerHTML = ''; }
+  const lbc = clone.querySelector('#lb'); if(lbc){ lbc.className = ''; lbc.setAttribute('aria-hidden', 'true'); const st = lbc.querySelector('#lbStage'); if(st){ st.innerHTML = ''; st.removeAttribute('style'); } }
+  const kbc = clone.querySelector('#kb'); if(kbc){ kbc.className = ''; }
+  const ss = clone.querySelector('#saveStatus'); if(ss) ss.innerHTML = '';
+  return '<!DOCTYPE html>\n' + clone.outerHTML;
+}
+function downloadHTML(){
+  const doc = snapshotHTML();
+  const blob = new Blob([doc], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const site = (document.getElementById('val-jobsite') || {}).textContent || 'Job-Site';
+  const date = (document.getElementById('val-date') || {}).textContent || '';
+  const safe = (site + '-' + date).trim().replace(/[^\w\-]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+  a.href = url;
+  a.download = 'YSD-Daily-Safety-Report' + (safe ? '-' + safe : '') + '.html';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+  flashStatus('HTML copy saved. Open it any time: every photo enlarges when clicked.');
 }
 
 /* ---------- footer auto-bind from Project Info ---------- */
@@ -1174,175 +2438,78 @@ function bindFooter(){
   refresh();
 }
 
-/* ---------- Save as PDF ---------- */
-function savePDF(){
-  rescaleAllCanvases();
-  window.print();
-}
-
-/* ---------- Download completed report as a FINAL, locked, read-only HTML file ----------
-   The working copy (this page) stays fully editable. What gets downloaded is a
-   separate, static snapshot: every add/remove/move/resize control and the whole
-   bottom action bar are stripped out, every field is frozen from contenteditable
-   to plain text, and the interactive script is replaced with a tiny read-only one
-   that only keeps photos correctly positioned/scaled (including for print) —
-   nothing left to click or edit. */
-const LOCKED_VIEW_SCRIPT =
-  "(function(){\n" +
-  "function layout(){\n" +
-  "  document.querySelectorAll('.photo-canvas').forEach(function(canvasEl){\n" +
-  "    var cw = canvasEl.clientWidth || canvasEl.getBoundingClientRect().width || 600;\n" +
-  "    canvasEl.querySelectorAll(':scope > .photo-item').forEach(function(item){\n" +
-  "      var x = parseFloat(item.dataset.x) || 0;\n" +
-  "      var y = parseFloat(item.dataset.y) || 0;\n" +
-  "      var w = parseFloat(item.dataset.w) || 30;\n" +
-  "      var widthPx = Math.max(80, cw * w / 100);\n" +
-  "      item.style.width = widthPx + 'px';\n" +
-  "      item.style.left = (cw * x / 100) + 'px';\n" +
-  "      item.style.top = (cw * y / 100) + 'px';\n" +
-  "    });\n" +
-  "    var maxBottom = 0;\n" +
-  "    canvasEl.querySelectorAll(':scope > .photo-item').forEach(function(item){\n" +
-  "      var top = parseFloat(item.style.top) || 0;\n" +
-  "      maxBottom = Math.max(maxBottom, top + item.offsetHeight);\n" +
-  "    });\n" +
-  "    canvasEl.style.minHeight = (maxBottom > 0 ? (maxBottom + 20) : 60) + 'px';\n" +
-  "  });\n" +
-  "}\n" +
-  "layout();\n" +
-  "window.addEventListener('resize', layout);\n" +
-  "window.addEventListener('beforeprint', layout);\n" +
-  "if(window.matchMedia){\n" +
-  "  var pq = window.matchMedia('print');\n" +
-  "  if(pq.addEventListener) pq.addEventListener('change', function(e){ if(e.matches) layout(); });\n" +
-  "}\n" +
-  "})();";
-
-function downloadHTML(){
-  rescaleAllCanvases();
-  const clone = document.documentElement.cloneNode(true);
-
-  // Remove every add/remove/move/resize control and the whole action bar.
-  clone.querySelectorAll(
-    '.bottom-bar, .drop-zone, .group-controls, .photo-controls, .resize-handle, ' +
-    '.cell-del, .row-del, .canvas-hint, #saveStatus, #lb'
-  ).forEach(el => el.remove());
-  clone.querySelectorAll(
-    '[onclick^="addInfoField"], [onclick^="addChecklistItem"], [onclick^="addPhotoGroup"]'
-  ).forEach(el => el.remove());
-
-  // Freeze every field: no more contenteditable, no more editable-field styling.
-  clone.querySelectorAll('[contenteditable]').forEach(el => {
-    el.removeAttribute('contenteditable');
-    el.classList.remove('editable');
-  });
-
-  // Swap the live editing script for the small read-only positioning script above.
-  clone.querySelectorAll('script').forEach(s => s.remove());
-  const lockScript = document.createElement('script');
-  lockScript.textContent = LOCKED_VIEW_SCRIPT;
-  (clone.querySelector('body') || clone).appendChild(lockScript);
-
-  const doc = '<!DOCTYPE html>\n' + clone.outerHTML;
-  const blob = new Blob([doc], {type:'text/html'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  const site = (document.getElementById('val-jobsite')||{}).textContent || 'Job-Site';
-  const date = (document.getElementById('val-date')||{}).textContent || '';
-  const safe = (site + '-' + date).trim().replace(/[^\w\-]+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
-  a.href = url;
-  a.download = 'YSD-Daily-Safety-Report' + (safe ? '-' + safe : '') + '.html';
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 4000);
-  flashStatus('Final report saved — a locked, read-only copy with no edit buttons.');
-}
-
-/* ---------- Clear form ---------- */
-function clearForm(){
-  if(!confirm('This will erase everything entered in this report (text and photos). This cannot be undone. Continue?')) return;
-  localStorage.removeItem(STORAGE_KEY);
-  location.reload();
-}
-
 /* ---------- autosave to localStorage (best effort) ---------- */
 let saveTimer = null;
 function scheduleSave(){
+  if(viewMode) return;
   clearTimeout(saveTimer);
   saveTimer = setTimeout(doSave, 600);
 }
 function doSave(){
+  if(viewMode) return;
   try{
-    const data = document.getElementById('reportRoot').innerHTML;
-    localStorage.setItem(STORAGE_KEY, data);
+    const clone = document.getElementById('reportRoot').cloneNode(true);
+    clone.querySelectorAll('.selected, .cropping, .marking, .dragging, .resizing').forEach(n => n.classList.remove('selected', 'cropping', 'marking', 'dragging', 'resizing'));
+    clone.querySelectorAll('.crop-layer, .mark-layer, .snap-guide, .pf').forEach(n => n.remove());
+    clone.querySelectorAll('.photo-group.has-pf').forEach(n => n.classList.remove('has-pf'));
+    localStorage.setItem(STORAGE_KEY, clone.innerHTML);
     flashStatus('Autosaved to this browser at ' + new Date().toLocaleTimeString());
   }catch(e){
-    flashStatus('Autosave unavailable (storage full or blocked) — use "Download Report" to save your work.');
+    flashStatus('Autosave is full or blocked. Press Ctrl+S to keep an HTML copy of your work.');
   }
-}
-function flashStatus(msg){
-  const el = document.getElementById('saveStatus');
-  if(el) el.textContent = msg;
 }
 function restoreAutosave(){
   try{
     const data = localStorage.getItem(STORAGE_KEY);
-    if(data){
-      document.getElementById('reportRoot').innerHTML = data;
-      return true;
-    }
+    if(data && data.indexOf('signin') < 0){ document.getElementById('reportRoot').innerHTML = data; return true; }
   }catch(e){ /* ignore */ }
   return false;
 }
-
-/* ---------- wire up listeners after DOM ready ---------- */
 function wireAutosaveListeners(){
-  const root = document.getElementById('reportRoot');
-  root.addEventListener('input', scheduleSave);
+  document.getElementById('reportRoot').addEventListener('input', scheduleSave);
 }
 
+/* re-attach everything that is not delegated after the DOM was replaced / loaded */
 function rewireAfterRestore(){
-  // Re-attach event listeners for restored content: innerHTML replacement re-runs
-  // inline onclick/onchange attributes automatically, but addEventListener-based
-  // behavior (drop zones, photo drag/resize) needs to be re-attached in code.
-  document.querySelectorAll('.photo-group').forEach(g => {
+  $$('.photo-group').forEach(g => {
     const gid = g.dataset.gid;
     if(gid) wireDropZone(gid);
-  });
-  document.querySelectorAll('.photo-canvas').forEach(canvasEl => {
-    canvasEl.querySelectorAll(':scope > .photo-item').forEach(item => {
-      layoutItem(item);
-      enableDragResize(item, canvasEl);
-      const img = item.querySelector('img');
-      if(img) img.addEventListener('load', () => recalcCanvasHeight(canvasEl));
-    });
-    recalcCanvasHeight(canvasEl);
-  });
-  // keep the group-id counter ahead of any restored groups so new groups get fresh ids
-  document.querySelectorAll('.photo-group').forEach(g => {
-    const m = /^g(\d+)_/.exec(g.dataset.gid || '');
+    const m = /^g(\d+)_/.exec(gid || '');
     if(m) groupCounter = Math.max(groupCounter, parseInt(m[1], 10));
   });
+  $$('.photo-item').forEach(it => {
+    if(!it.dataset.pid) it.dataset.pid = newPid();
+    const im = $('img.pimg', it);
+    if(im) srcStore.set(it.dataset.pid, im.getAttribute('src'));
+    $$('.crop-layer, .mark-layer', it).forEach(n => n.remove());
+  });
+  rescaleAllCanvases();
+  const lastImgs = $$('.photo-item img.pimg');
+  lastImgs.forEach(im => { if(!im.complete) im.addEventListener('load', () => rescaleAllCanvases(), { once: true }); });
   updatePhotoCount();
   bindFooter();
 }
 
 window.addEventListener('beforeunload', function(){
+  if(viewMode) return;
   clearTimeout(saveTimer);
   doSave();
 });
 
 window.addEventListener('DOMContentLoaded', function(){
-  const restored = restoreAutosave();
-  if(!restored){
-    // seed one starter checklist item and one starter photo group so the coworker
-    // sees the expected format
-    addChecklistItem();
-    addPhotoGroup('');
+  const savedCopy = document.documentElement.getAttribute('data-saved') === '1';
+  let restored = false;
+  if(!savedCopy){
+    restored = restoreAutosave();
+    if(!restored){
+      addChecklistItem();
+      addPhotoGroup('');
+    }
   }
   rewireAfterRestore();
   wireAutosaveListeners();
+  setViewMode(savedCopy);
+  if(!savedCopy){ hist = []; hidx = -1; commit(); }
   if(restored) flashStatus('Restored your last autosaved progress from this browser.');
 });
 
